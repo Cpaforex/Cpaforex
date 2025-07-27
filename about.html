@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>درباره ما | CONTINUOUS PROFIT ACADEMY</title>
+  <title>درباره ما | CPA - CONTINUOUS PROFIT ACADEMY</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -99,14 +99,64 @@
   </style>
 </head>
 <body>
+  <script src="js/config.js"></script>
   <script src="js/navbar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Update contract address from config
+      const contractAddressElement = document.getElementById('contract-address');
+      const copyAddressBtn = document.getElementById('copy-address-btn');
+      
+      if (contractAddressElement && typeof CONTRACT_ADDRESS !== 'undefined') {
+        contractAddressElement.textContent = CONTRACT_ADDRESS;
+        
+        // Add copy functionality
+        function copyToClipboard(text) {
+          navigator.clipboard.writeText(text).then(function() {
+            // Show success feedback
+            const originalText = copyAddressBtn.textContent;
+            copyAddressBtn.textContent = '✅';
+            copyAddressBtn.style.color = '#00ff88';
+            setTimeout(() => {
+              copyAddressBtn.textContent = originalText;
+              copyAddressBtn.style.color = '#00ff88';
+            }, 2000);
+          }).catch(function(err) {
+            console.error('خطا در کپی کردن: ', err);
+            copyAddressBtn.textContent = '❌';
+            copyAddressBtn.style.color = '#ff4757';
+            setTimeout(() => {
+              copyAddressBtn.textContent = '📋';
+              copyAddressBtn.style.color = '#00ff88';
+            }, 2000);
+          });
+        }
+        
+        // Add click event to copy button
+        if (copyAddressBtn) {
+          copyAddressBtn.addEventListener('click', function() {
+            copyToClipboard(CONTRACT_ADDRESS);
+          });
+        }
+        
+        // Add click event to address span
+        contractAddressElement.addEventListener('click', function() {
+          copyToClipboard(CONTRACT_ADDRESS);
+        });
+        
+      } else if (contractAddressElement) {
+        contractAddressElement.textContent = 'خطا در بارگذاری آدرس قرارداد';
+        contractAddressElement.style.color = '#ff4757';
+      }
+    });
+  </script>
   <section class="about-section">
     <h2>درباره آکادمی سود مستمر (CPA)</h2>
     <div class="about-content">
       <p style="font-family: 'Fira Mono', monospace; direction: rtl; text-align: justify; font-size: 1.08rem; line-height: 2.1; color: #fff; background: rgba(0,255,136,0.04); border-radius: 12px; padding: 1.2rem 1rem; margin-bottom: 1.5rem;">
         آکادمی سود مستمر (CPA) یک اکوسیستم غیرمتمرکز و باز است که بر بستر قراردادهای هوشمند و فناوری بلاکچین بنا شده و هدف آن ایجاد فضایی شفاف، امن و مشارکتی برای رشد و پیشرفت همه افراد است.<br><br>
         در این پلتفرم، هیچ مرزی برای خلاقیت و پیشرفت وجود ندارد؛ هر فردی، از هر نقطه جهان، می‌تواند خدمات، محصولات یا دانش خود را ارائه کند و به جامعه بزرگ ما بپیوندد. ساختار غیرمتمرکز ما به گونه‌ای طراحی شده که هیچ نهاد یا فردی کنترل مطلق ندارد و همه اعضا در تصمیم‌گیری‌ها و سودآوری سهیم‌اند.<br><br>
-        قرارداد هوشمند ما (آدرس: <span style='color:#00ff88;font-family:monospace;'>0xA324B982c070d803BE0828890325483b6696Cd24</span>) با معماری ABI باز و شفاف، امکان تعامل مستقیم، خرید و فروش توکن، ثبت‌نام، مشارکت در شبکه و دریافت پاداش را بدون واسطه و با امنیت کامل فراهم می‌کند. هر تراکنش، هر رشد و هر موفقیت، به صورت شفاف و قابل رهگیری در بلاکچین ثبت می‌شود.<br><br>
+        قرارداد هوشمند ما (آدرس: <span id="contract-address" style='color:#00ff88;font-family:monospace;cursor:pointer;' title='کلیک برای کپی کردن آدرس'>در حال بارگذاری...</span> <button id="copy-address-btn" style='background:none;border:none;color:#00ff88;cursor:pointer;font-size:0.9rem;margin-right:5px;' title='کپی کردن آدرس'>📋</button>) با معماری ABI باز و شفاف، امکان تعامل مستقیم، خرید و فروش توکن، ثبت‌نام، مشارکت در شبکه و دریافت پاداش را بدون واسطه و با امنیت کامل فراهم می‌کند. هر تراکنش، هر رشد و هر موفقیت، به صورت شفاف و قابل رهگیری در بلاکچین ثبت می‌شود.<br><br>
         فرصت‌های رشد در این فضا بی‌نهایت است: می‌توانید به عنوان کاربر، فروشنده، مربی، توسعه‌دهنده یا حتی سرمایه‌گذار وارد شوید و از مزایای شبکه بهره‌مند شوید. هر کسی می‌تواند خدمات یا محصولات خود را در مارکت‌پلیس ما عرضه کند و با جامعه‌ای پویا و مشتاق، ارتباط مستقیم برقرار نماید.<br><br>
         ما باور داریم آینده اقتصاد و آموزش، متعلق به ساختارهای غیرمتمرکز و مردم‌محور است؛ جایی که شفافیت، اعتماد و همکاری جایگزین واسطه‌گری و انحصار می‌شود. CPA فقط یک پلتفرم نیست؛ یک جنبش برای رشد جمعی، آزادی مالی و فرصت برابر برای همه است.<br><br>
         به ما بپیوندید و سهم خود را از آینده‌ای شفاف، آزاد و پرامید بسازید.
