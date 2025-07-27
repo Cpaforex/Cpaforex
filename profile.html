@@ -205,6 +205,8 @@
                 <div class="profile-row"><span class="profile-label">آخرین برداشت امتیاز:</span><span class="profile-value">${formatDateTime(user.lastClaimTime)}</span></div>
                 <div class="profile-row"><span class="profile-label">امتیاز چپ:</span><span class="profile-value">${user.leftPoints}</span></div>
                 <div class="profile-row"><span class="profile-label">امتیاز راست:</span><span class="profile-value">${user.rightPoints}</span></div>
+                <div class="profile-row"><span class="profile-label">تعداد ولت‌های سمت چپ:</span><span class="profile-value" id="profile-left-wallets">در حال محاسبه...</span></div>
+                <div class="profile-row"><span class="profile-label">تعداد ولت‌های سمت راست:</span><span class="profile-value" id="profile-right-wallets">در حال محاسبه...</span></div>
                 <div class="profile-row"><span class="profile-label">آخرین برداشت ماهانه:</span><span class="profile-value">${formatDateTime(user.lastMonthlyClaim)}</span></div>
                 <div class="profile-row"><span class="profile-label">کل پاداش ماهانه:</span><span class="profile-value">${user.totalMonthlyRewarded}</span></div>
                 <div class="profile-row"><span class="profile-label">پاداش رفرال:</span><span class="profile-value">${Number(user.refclimed.toString())/1e18|0}</span></div>
@@ -344,6 +346,13 @@
             // راه‌اندازی دکمه کپی لینک رفرال
             if (typeof setupReferralCopy === 'function') {
                 setupReferralCopy();
+            }
+            
+            // محاسبه و نمایش تعداد ولت‌های سمت راست و چپ
+            if (typeof updateWalletCountsDisplay === 'function') {
+                setTimeout(async () => {
+                    await updateWalletCountsDisplay();
+                }, 1000); // تاخیر 1 ثانیه برای اطمینان از بارگذاری کامل
             }
         } catch (e) {
             content.innerHTML = `<div class="error-message">خطا: ${e.message || e}</div>`;

@@ -618,3 +618,132 @@ function startBinaryClaimCountdown(lastClaimTime) {
 
 // اضافه کردن تابع به window برای دسترسی جهانی
 window.startBinaryClaimCountdown = startBinaryClaimCountdown;
+
+// تابع محاسبه تعداد ولت‌های سمت راست و چپ
+async function calculateWalletCounts(userIndex, contract) {
+    try {
+        console.log(`🔍 محاسبه تعداد ولت‌ها برای ایندکس ${userIndex}...`);
+        
+        let leftCount = 0;
+        let rightCount = 0;
+        
+        // بررسی فرزندان مستقیم
+        const leftChildIndex = BigInt(userIndex) * 2n;
+        const rightChildIndex = BigInt(userIndex) * 2n + 1n;
+        
+        // بررسی فرزند چپ
+        try {
+            const leftAddress = await contract.indexToAddress(leftChildIndex);
+            if (leftAddress && leftAddress !== '0x0000000000000000000000000000000000000000') {
+                const leftUser = await contract.users(leftAddress);
+                if (leftUser && leftUser.activated) {
+                    leftCount = 1;
+                    // محاسبه بازگشتی برای فرزندان فرزند چپ
+                    leftCount += await calculateSubtreeCount(leftChildIndex, contract, 'left');
+                }
+            }
+        } catch (e) {
+            console.log(`خطا در بررسی فرزند چپ:`, e);
+        }
+        
+        // بررسی فرزند راست
+        try {
+            const rightAddress = await contract.indexToAddress(rightChildIndex);
+            if (rightAddress && rightAddress !== '0x0000000000000000000000000000000000000000') {
+                const rightUser = await contract.users(rightAddress);
+                if (rightUser && rightUser.activated) {
+                    rightCount = 1;
+                    // محاسبه بازگشتی برای فرزندان فرزند راست
+                    rightCount += await calculateSubtreeCount(rightChildIndex, contract, 'right');
+                }
+            }
+        } catch (e) {
+            console.log(`خطا در بررسی فرزند راست:`, e);
+        }
+        
+        console.log(`✅ تعداد ولت‌ها: چپ=${leftCount}, راست=${rightCount}`);
+        return { leftCount, rightCount };
+        
+    } catch (error) {
+        console.error(`خطا در محاسبه تعداد ولت‌ها:`, error);
+        return { leftCount: 0, rightCount: 0 };
+    }
+}
+
+// تابع محاسبه بازگشتی تعداد ولت‌ها در زیرمجموعه
+async function calculateSubtreeCount(parentIndex, contract, side) {
+    let count = 0;
+    // const maxDepth = 10; // حذف محدودیت عمق
+    async function countRecursive(index) {
+        const leftChildIndex = BigInt(index) * 2n;
+        const rightChildIndex = BigInt(index) * 2n + 1n;
+        let subtreeCount = 0;
+        // بررسی فرزند چپ
+        try {
+            const leftAddress = await contract.indexToAddress(leftChildIndex);
+            if (leftAddress && leftAddress !== '0x0000000000000000000000000000000000000000') {
+                const leftUser = await contract.users(leftAddress);
+                if (leftUser && leftUser.activated) {
+                    subtreeCount += 1;
+                    subtreeCount += await countRecursive(leftChildIndex);
+                }
+            }
+        } catch (e) {
+            // نادیده گرفتن خطاها
+        }
+        // بررسی فرزند راست
+        try {
+            const rightAddress = await contract.indexToAddress(rightChildIndex);
+            if (rightAddress && rightAddress !== '0x0000000000000000000000000000000000000000') {
+                const rightUser = await contract.users(rightAddress);
+                if (rightUser && rightUser.activated) {
+                    subtreeCount += 1;
+                    subtreeCount += await countRecursive(rightChildIndex);
+                }
+            }
+        } catch (e) {
+            // نادیده گرفتن خطاها
+        }
+        return subtreeCount;
+    }
+    return await countRecursive(parentIndex);
+}
+
+// تابع به‌روزرسانی نمایش تعداد ولت‌ها در پروفایل
+async function updateWalletCountsDisplay() {
+    try {
+        if (!window.connectWallet) return;
+        
+        const { contract, address } = await window.connectWallet();
+        if (!contract || !address) return;
+        
+        const user = await contract.users(address);
+        if (!user || !user.activated || !user.index) return;
+        
+        const userIndex = parseInt(user.index);
+        const counts = await calculateWalletCounts(userIndex, contract);
+        
+        // به‌روزرسانی نمایش در پروفایل
+        const leftCountEl = document.getElementById('profile-left-wallets');
+        const rightCountEl = document.getElementById('profile-right-wallets');
+        
+        if (leftCountEl) {
+            leftCountEl.textContent = counts.leftCount;
+            leftCountEl.style.color = counts.leftCount > 0 ? '#00ff88' : '#666';
+        }
+        
+        if (rightCountEl) {
+            rightCountEl.textContent = counts.rightCount;
+            rightCountEl.style.color = counts.rightCount > 0 ? '#00ff88' : '#666';
+        }
+        
+        console.log(`✅ نمایش تعداد ولت‌ها به‌روزرسانی شد: چپ=${counts.leftCount}, راست=${counts.rightCount}`);
+        
+    } catch (error) {
+        console.error(`خطا در به‌روزرسانی نمایش تعداد ولت‌ها:`, error);
+    }
+}
+
+// اضافه کردن توابع به window برای دسترسی جهانی
+window.calculateWalletCounts = calculateWalletCounts;
+window.updateWalletCountsDisplay = updateWalletCountsDisplay;
