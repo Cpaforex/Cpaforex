@@ -197,12 +197,12 @@
             <div style="color:#888;font-size:0.7rem;margin-top:0.2rem;">Cashback Pool</div>
           </div>
           
-          <!-- USDC Contract Balance Card -->
+          <!-- DAI Contract Balance Card -->
           <div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:0.8rem;border:1px solid rgba(0,123,255,0.2);text-align:center;min-width:140px;flex:1;max-width:180px;">
             <div style="color:#007bff;font-size:1.2rem;margin-bottom:0.3rem;">💵</div>
-            <div style="color:#fff;font-size:0.8rem;font-weight:bold;margin-bottom:0.2rem;">موجودی USDC</div>
+            <div style="color:#fff;font-size:0.8rem;font-weight:bold;margin-bottom:0.2rem;">موجودی DAI</div>
             <div style="color:#007bff;font-size:0.9rem;font-family:monospace;font-weight:bold;" id="dashboard-usdc-balance">-</div>
-            <div style="color:#888;font-size:0.7rem;margin-top:0.2rem;">USDC in Contract</div>
+            <div style="color:#888;font-size:0.7rem;margin-top:0.2rem;">DAI in Contract</div>
           </div>
           
           <!-- Network Status Card -->
@@ -226,7 +226,7 @@
             <div style="color:#00ff88;font-size:1.2rem;margin-bottom:0.3rem;">💲</div>
             <div style="color:#fff;font-size:0.8rem;font-weight:bold;margin-bottom:0.2rem;">قیمت توکن CPA</div>
             <div style="color:#00ff88;font-size:0.9rem;font-family:monospace;font-weight:bold;" id="dashboard-token-price">-</div>
-            <div style="color:#888;font-size:0.7rem;margin-top:0.2rem;">USDC per CPA</div>
+            <div style="color:#888;font-size:0.7rem;margin-top:0.2rem;">DAI per CPA</div>
           </div>
           
           <!-- Wallet Count Card -->
@@ -373,7 +373,7 @@
   <div id="main-swap" class="page-section expandable-container" style="width:100vw;max-width:none;margin:0;left:0;right:0;padding:0.5rem 0;display:none;">
     <div class="expand-header" style="padding:0 1.5rem;">
       <h2 style="margin:0 0 0.5rem 0;">🔄 تبدیل ارز</h2>
-      <p style="margin:0 0 0.5rem 0;">تبدیل بین توکن‌های USDC و CPA</p>
+      <p style="margin:0 0 0.5rem 0;">تبدیل بین توکن‌های DAI و CPA</p>
     </div>
     <div class="expand-content" style="padding:0;">
       <div class="swap-container" style="max-width:600px;margin:0 auto;padding:1.5rem;">
@@ -385,10 +385,10 @@
           <div style="margin-bottom:1rem;">
             <h4 style="color:#00ff88;margin-bottom:0.5rem;">🔄 نحوه تبدیل:</h4>
             <ul style="color:#b8c1ec;line-height:1.6;margin:0;padding-right:1rem;">
-              <li>✅ <strong style="color:#00ff88;">USDC → CPA:</strong> خرید توکن CPA با USDC (نرخ متغیر)</li>
-              <li>✅ <strong style="color:#00ff88;">CPA → USDC:</strong> فروش توکن CPA و دریافت USDC</li>
+              <li>✅ <strong style="color:#00ff88;">DAI → CPA:</strong> خرید توکن CPA با DAI (نرخ متغیر)</li>
+              <li>✅ <strong style="color:#00ff88;">CPA → DAI:</strong> فروش توکن CPA و دریافت DAI</li>
               <li>✅ کارمزد تبدیل: 2% از مبلغ تبدیل</li>
-              <li>✅ حداقل مقدار تبدیل: 1 USDC یا 1 CPA</li>
+              <li>✅ حداقل مقدار تبدیل: 1 DAI یا 1 CPA</li>
             </ul>
           </div>
           
@@ -396,7 +396,7 @@
             <h4 style="color:#00ff88;margin-bottom:0.5rem;">💰 مزایای تبدیل:</h4>
             <ul style="color:#b8c1ec;line-height:1.6;margin:0;padding-right:1rem;">
               <li><strong style="color:#00ff88;">CPA:</strong> توکن اصلی پلتفرم - برای سرمایه‌گذاری و کسب درآمد</li>
-              <li><strong style="color:#00ccff;">USDC:</strong> توکن استیبل - برای حفظ ارزش و معاملات روزانه</li>
+              <li><strong style="color:#00ccff;">DAI:</strong> توکن استیبل - برای حفظ ارزش و معاملات روزانه</li>
               <li>🔄 تبدیل فوری و بدون نیاز به تایید اضافی</li>
               <li>📊 نرخ تبدیل بر اساس عرضه و تقاضا محاسبه می‌شود</li>
             </ul>
@@ -419,7 +419,7 @@
     <div><b>امتیاز کل:</b> <span id="total-points">...</span></div>
     <div><b>موجودی CPA قرارداد:</b> <span id="contract-token-balance">...</span></div>
     <div><b>کَش‌بَک:</b> <span id="dashboard-cashback-value">...</span></div>
-    <div><b>موجودی USDC قرارداد:</b> <span id="dashboard-usdc-balance">...</span></div>
+    <div><b>موجودی DAI قرارداد:</b> <span id="dashboard-usdc-balance">...</span></div>
     <div><b>ارزش هر امتیاز:</b> <span id="dashboard-point-value">...</span></div>
     <div><b>قیمت توکن:</b> <span id="dashboard-token-price">...</span></div>
     <div><b>تعداد کیف پول‌ها:</b> <span id="dashboard-wallets-count">...</span></div>
@@ -431,8 +431,8 @@
           <div class="swap-row">
             <label for="swapDirection">نوع تبدیل:</label>
             <select id="swapDirection" required>
-              <option value="usdc-to-cpa">USDC → CPA</option>
-              <option value="cpa-to-usdc">CPA → USDC</option>
+              <option value="usdc-to-cpa">DAI → CPA</option>
+              <option value="cpa-to-usdc">CPA → DAI</option>
             </select>
             <small style="color:#b8c1ec;font-size:0.85rem;margin-top:0.3rem;display:block;">نوع تبدیل مورد نظر را انتخاب کنید</small>
           </div>
@@ -459,7 +459,7 @@
           <h4 style="color:#00ff88;margin-bottom:0.8rem;">💰 موجودی فعلی شما:</h4>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
             <div style="text-align:center;">
-              <div style="color:#00ff88;font-weight:bold;">USDC</div>
+              <div style="color:#00ff88;font-weight:bold;">DAI</div>
               <div id="usdcBalance" style="color:#b8c1ec;font-family:monospace;">-</div>
             </div>
             <div style="text-align:center;">
@@ -498,7 +498,7 @@
           <div style="margin-bottom:1rem;">
             <h4 style="color:#a786ff;margin-bottom:0.5rem;">💰 انواع توکن قابل انتقال:</h4>
             <ul style="color:#b8c1ec;line-height:1.6;margin:0;padding-right:1rem;">
-              <li><strong style="color:#00ff88;">USDC:</strong> توکن استیبل با ارزش 1 دلار - برای معاملات روزانه</li>
+              <li><strong style="color:#00ff88;">DAI:</strong> توکن استیبل با ارزش 1 دلار - برای معاملات روزانه</li>
               <li><strong style="color:#a786ff;">POL (MATIC):</strong> توکن شبکه Polygon - برای پرداخت کارمزد تراکنش‌ها</li>
               <li><strong style="color:#00ccff;">CPA:</strong> توکن اصلی پلتفرم - برای سرمایه‌گذاری و کسب درآمد</li>
             </ul>
@@ -547,7 +547,7 @@
           <div class="transfer-row">
             <label for="transferToken">نوع توکن:</label>
             <select id="transferToken" required>
-              <option value="usdc" selected>USDC</option>
+              <option value="usdc" selected>DAI</option>
               <option value="pol">POL</option>
               <option value="cpa">CPA</option>
             </select>
@@ -559,7 +559,7 @@
             <h4 style="color:#a786ff;margin-bottom:0.8rem;">💰 موجودی فعلی شما:</h4>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
               <div style="text-align:center;">
-                <div style="color:#00ff88;font-weight:bold;">USDC</div>
+                <div style="color:#00ff88;font-weight:bold;">DAI</div>
                 <div id="transfer-usdc-balance" style="color:#b8c1ec;font-family:monospace;">-</div>
               </div>
               <div style="text-align:center;">
@@ -993,13 +993,13 @@
             status.textContent = 'انتقال با موفقیت انجام شد!\nکد تراکنش: ' + tx.hash;
             status.className = 'transfer-status success';
           } else if (token === 'usdc') {
-            // انتقال USDC
+            // انتقال DAI
             const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, window.contractConfig.signer);
-            const decimals = 6; // USDC has 6 decimals
+            const decimals = 6; // DAI has 18 decimals
             const parsedAmount = ethers.parseUnits(amount.toString(), decimals);
             const tx = await usdcContract.transfer(to, parsedAmount);
             await tx.wait();
-            status.textContent = 'انتقال USDC با موفقیت انجام شد!\nکد تراکنش: ' + tx.hash;
+            status.textContent = 'انتقال DAI با موفقیت انجام شد!\nکد تراکنش: ' + tx.hash;
             status.className = 'transfer-status success';
           } else {
             // انتقال CPA

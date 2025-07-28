@@ -184,10 +184,10 @@
                         <div style="color:#00ff88; font-size:1.1rem; font-family:monospace; font-weight:bold;" id="cpa-balance">-</div>
                     </div>
 
-                    <!-- USDC Balance -->
+                    <!-- DAI Balance -->
                     <div style="background:rgba(0,0,0,0.3); border-radius:12px; padding:1rem; text-align:center; border:1px solid rgba(0,123,255,0.2);">
                         <div style="color:#007bff; font-size:1.2rem; margin-bottom:0.5rem;">💵</div>
-                        <div style="color:#fff; font-size:0.9rem; margin-bottom:0.3rem;">USDC</div>
+                        <div style="color:#fff; font-size:0.9rem; margin-bottom:0.3rem;">DAI</div>
                         <div style="color:#007bff; font-size:1.1rem; font-family:monospace; font-weight:bold;" id="usdc-balance">-</div>
                     </div>
 
@@ -354,17 +354,17 @@
                 const cpaBalance = await contract.balanceOf(currentWalletAddress);
                 document.getElementById('cpa-balance').textContent = ethers.formatEther(cpaBalance);
 
-                // دریافت موجودی USDC
+                // دریافت موجودی DAI
                 try {
                     if (typeof USDC_ADDRESS !== 'undefined' && typeof USDC_ABI !== 'undefined') {
                         const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, contractConfig.signer);
                         const usdcBalance = await usdcContract.balanceOf(currentWalletAddress);
                         document.getElementById('usdc-balance').textContent = ethers.formatUnits(usdcBalance, 6);
                     } else {
-                        document.getElementById('usdc-balance').textContent = 'USDC در دسترس نیست';
+                        document.getElementById('usdc-balance').textContent = 'DAI در دسترس نیست';
                     }
                 } catch (error) {
-                    console.error('خطا در بارگذاری موجودی USDC:', error);
+                    console.error('خطا در بارگذاری موجودی DAI:', error);
                     document.getElementById('usdc-balance').textContent = 'خطا در بارگذاری';
                 }
 

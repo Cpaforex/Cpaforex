@@ -140,10 +140,10 @@
             // موجودی‌ها
             const maticBalance = await provider.getBalance(address);
             const cpaBalance = await contract.balanceOf(address);
-            // USDC
+            // DAI
             let usdcBalance = '0';
             try {
-                const usdcAddress = window.USDC_ADDRESS || '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+                const usdcAddress = window.USDC_ADDRESS || '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063';
                 const usdcAbi = window.USDC_ABI || [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}];
                 const usdc = new ethers.Contract(usdcAddress, usdcAbi, provider);
                 const usdcRaw = await usdc.balanceOf(address);
@@ -184,7 +184,7 @@
                         <span class="balance-value">${Number.parseFloat(ethers.formatEther(maticBalance.toString())).toLocaleString('en-US', {maximumFractionDigits: 4})}</span>
                     </div>
                     <div class="balance-item">
-                        <div class="balance-label">USDC</div>
+                        <div class="balance-label">DAI</div>
                         <span class="balance-value">${Number.parseFloat(usdcBalance.toString()).toLocaleString('en-US', {maximumFractionDigits: 4})}</span>
                     </div>
                 </div>

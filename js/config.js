@@ -6,7 +6,7 @@ const deepseek_api ='sk-6074908ce7954bd89d494d57651392a8';
 
 const CONTRACT_ADDRESS = '0x3c07cE8c5CBD79E4358161a00A55046dd0Eadb70';
 
-const USDC_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'; // Polygon USDC
+const USDC_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'; // Polygon USDC
 const USDC_ABI =[
 	{
 		"inputs": [
@@ -4184,7 +4184,7 @@ window.updateDashboardStats = async function() {
       safeUpdate('dashboard-cashback-value', 'N/A');
     }
 
-    // USDC CONTRACT BALANCE - Using contract's getContractUSDCBalance function
+    // DAI CONTRACT BALANCE - Using contract's getContractUSDCBalance function
     try {
       console.log('💵 Fetching USDC contract balance...');
       let usdcBalance;
