@@ -255,6 +255,7 @@
         <a href="news.html" class="cpa-navbar-link">اخبار</a>
         <a href="learning.html" class="cpa-navbar-link">آموزش</a>
         <a href="professional-tree.html" class="cpa-navbar-link">شبکه</a>
+        <a href="products.html" class="cpa-navbar-link">🛍️ محصولات</a>
         <a href="utility.html" class="cpa-navbar-link">🛠️ ابزارها</a>
         <a href="about.html" class="cpa-navbar-link">درباره ما</a>
       </div>
@@ -274,8 +275,9 @@
         <div class="cpa-navbar-section-title">دسترسی سریع</div>
         <a href="index.html#main-dashboard" class="cpa-navbar-link">خانه</a>
         <a href="news.html" class="cpa-navbar-link">اخبار</a>
-        <a href="learning.html" class="cpa-navbar-link">آموزش</a>
+                <a href="learning.html" class="cpa-navbar-link">آموزش</a>
         <a href="professional-tree.html" class="cpa-navbar-link">شبکه</a>
+        <a href="products.html" class="cpa-navbar-link">🛍️ محصولات</a>
         <a href="utility.html" class="cpa-navbar-link">🛠️ ابزارها</a>
         <a href="about.html" class="cpa-navbar-link">درباره ما</a>
       </div>
