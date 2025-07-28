@@ -24,15 +24,15 @@ class ProductsManager {
                 const userAddress = window.ethereum.selectedAddress;
                 
                 if (userAddress) {
-                    const userIndex = await contract.getUserIndex(userAddress);
+                    // استفاده از users(address) به جای getUserIndex
+                    const userData = await contract.users(userAddress);
+                    const userIndex = userData.index;
                     this.currentUser = {
                         address: userAddress,
                         index: userIndex
                     };
-                    
                     // بررسی دسترسی ادمین (ایندکس‌های 1، 2، 3)
                     this.isAdmin = userIndex >= 1 && userIndex <= 3;
-                    
                     if (this.isAdmin) {
                         this.showAdminPanel();
                     }
@@ -45,6 +45,8 @@ class ProductsManager {
     
     // بارگذاری داده‌ها
     loadData() {
+        // پاک‌سازی محصولات ذخیره‌شده برای رفع مشکل seller آبجکت
+        localStorage.removeItem('cpa_products');
         // بارگذاری محصولات از localStorage یا API
         const savedProducts = localStorage.getItem('cpa_products');
         if (savedProducts) {
@@ -171,14 +173,13 @@ class ProductsManager {
             <div class="product-info">
                 <div class="product-title">${product.title}</div>
                 <div class="product-description">${product.description}</div>
-                <div class="product-price">${product.price} CPA</div>
+                <div class="product-price">${product.price}</div>
                 <div class="product-seller">
                     فروشنده: ${product.sellerName}
                     <a href="#" class="profile-link" data-address="${product.seller}" onclick="openUserProfile('${product.seller}')" style="margin-right: 10px; color: #1976d2; text-decoration: none;">👤 پروفایل</a>
                 </div>
                 <div class="purchase-form">
-                    <input type="number" class="purchase-input" placeholder="مقدار CPA برای خرید" min="1">
-                    <button class="purchase-btn" onclick="productsManager.purchaseProduct(${product.id})">خرید محصول</button>
+                    <button class="purchase-btn" onclick="productsManager.purchaseProduct(${product.id})" disabled>خرید محصول</button>
                 </div>
                 <a href="${product.sellerPageUrl || '#'}" class="seller-page-link">صفحه فروشنده</a>
                 ${this.isAdmin ? `<button class="admin-btn danger" onclick="productsManager.removeProduct(${product.id})">حذف</button>` : ''}
@@ -195,32 +196,43 @@ class ProductsManager {
                 this.showMessage('خطا: محصول یافت نشد', 'error');
                 return;
             }
-            
-            const amountInput = event.target.parentNode.querySelector('.purchase-input');
-            const amount = parseInt(amountInput.value);
-            
-            if (!amount || amount <= 0) {
-                this.showMessage('لطفاً مقدار معتبر وارد کنید', 'error');
+            // اتصال به ولت
+            const userAddress = await connectWallet();
+            if (!userAddress) {
+                this.showMessage('خطا: کیف پول متصل نیست', 'error');
                 return;
             }
-            
-            if (typeof window.connectWallet === 'function') {
-                const { contract } = await window.connectWallet();
-                
-                // فراخوانی تابع purchase در قرارداد
-                const tx = await contract.purchase(amount, product.payout, product.seller);
-                await tx.wait();
-                
-                this.showMessage('خرید با موفقیت انجام شد!', 'success');
-                amountInput.value = '';
-                
-                // ثبت تراکنش
-                this.recordTransaction(product, amount);
-                
-            } else {
-                this.showMessage('خطا: کیف پول متصل نیست', 'error');
+            const { contract, provider } = await window.connectWallet();
+            // --- اضافه کردن بررسی موجودی توکن ERC20 ---
+            const tokenAddress = window.tokenAddress;
+            const tokenAbi = window.tokenAbi;
+            if (!tokenAddress || !tokenAbi) {
+                this.showMessage('خطا: اطلاعات توکن موجود نیست', 'error');
+                return;
             }
-            
+            const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, provider);
+            const balance = await tokenContract.balanceOf(userAddress);
+            if (balance.lt(ethers.BigNumber.from(product.price))) {
+                this.showMessage('خطا: موجودی کافی نیست', 'error');
+                return;
+            }
+            // استخراج sellerAddress به صورت رشته (در صورت آبجکت تو در تو)
+            let sellerAddress = product.seller;
+            let safetyCounter = 0;
+            while (typeof sellerAddress === 'object' && sellerAddress.address && safetyCounter < 5) {
+                sellerAddress = sellerAddress.address;
+                safetyCounter++;
+            }
+            console.log('sellerAddress for contract:', sellerAddress, typeof sellerAddress);
+            if (typeof sellerAddress !== 'string') {
+                this.showMessage('خطا: آدرس فروشنده نامعتبر است', 'error');
+                return;
+            }
+            // فراخوانی تابع purchase در قرارداد
+            const tx = await contract.purchase(product.price, product.payout, sellerAddress);
+            await tx.wait();
+            this.showMessage('خرید با موفقیت انجام شد!', 'success');
+            this.recordTransaction(product, product.price);
         } catch (error) {
             console.error('خطا در خرید:', error);
             this.showMessage('خطا در خرید محصول: ' + error.message, 'error');
