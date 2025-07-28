@@ -4978,3 +4978,7 @@ if (searchIndexBtn) {
     // ...
   };
 }
+
+// مقداردهی سراسری برای استفاده در products-manager.js و سایر بخش‌ها
+window.tokenAddress = CONTRACT_ADDRESS;
+window.tokenAbi = LEVELUP_ABI;
