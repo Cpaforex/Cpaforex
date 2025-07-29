@@ -26,7 +26,7 @@ class SwapManager {
         try {
             const contract = window.contractConfig.contract;
             const address = window.contractConfig.address;
-            const USDC_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+            const USDC_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063';
             const USDC_ABI = ["function balanceOf(address) view returns (uint256)"];
             const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, window.contractConfig.signer);
             const usdcBalance = await usdcContract.balanceOf(contract.target);
@@ -128,11 +128,11 @@ class SwapManager {
             const cpaBalanceFormatted = ethers.formatUnits(cpaBalance, 18);
 
             // موجودی USDC
-            const USDC_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+            const USDC_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063';
             const USDC_ABI = ["function balanceOf(address) view returns (uint256)"];
             const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, window.contractConfig.signer);
             const usdcBalance = await usdcContract.balanceOf(address);
-            const usdcBalanceFormatted = ethers.formatUnits(usdcBalance, 6);
+            const usdcBalanceFormatted = ethers.formatUnits(usdcBalance, 18);
 
             // نمایش موجودی‌ها
             const cpaBalanceEl = document.getElementById('cpaBalance');
@@ -326,7 +326,7 @@ class SwapManager {
         const contract = window.contractConfig.contract;
         const signer = window.contractConfig.signer;
         const address = window.contractConfig.address;
-        const USDC_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+        const USDC_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063';
         const USDC_ABI = [
             "function approve(address,uint256) public returns (bool)",
             "function allowance(address,address) public view returns (uint256)"
