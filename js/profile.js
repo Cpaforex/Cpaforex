@@ -46,7 +46,7 @@ async function loadUserProfile() {
         // گرفتن اطلاعات یوزر از قرارداد
         const userStruct = await contract.users(address);
         // گرفتن موجودی‌ها
-        let maticBalance = '0', lvlBalance = '0', usdcBalance = '0';
+        let maticBalance = '0', lvlBalance = '0', daiBalance = '0';
         if (provider) {
             maticBalance = await provider.getBalance(address);
             maticBalance = ethers.formatEther(maticBalance);
@@ -55,20 +55,20 @@ async function loadUserProfile() {
             lvlBalance = await contract.balanceOf(address);
             lvlBalance = ethers.formatUnits(lvlBalance, 18);
         }
-        // گرفتن USDC (در صورت وجود USDC_ADDRESS و ABI)
+        // گرفتن DAI (در صورت وجود DAI_ADDRESS و ABI)
         try {
-            if (typeof USDC_ADDRESS !== 'undefined' && typeof USDC_ABI !== 'undefined') {
-                const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider);
-                const usdcRaw = await usdcContract.balanceOf(address);
-                usdcBalance = (Number(usdcRaw) / 1e6).toFixed(2);
+            if (typeof window.DAI_ADDRESS !== 'undefined' && typeof window.DAI_ABI !== 'undefined') {
+                const daiContract = new ethers.Contract(window.DAI_ADDRESS, window.DAI_ABI, provider);
+                const daiRaw = await daiContract.balanceOf(address);
+                daiBalance = (Number(daiRaw) / 1e18).toFixed(2);
             }
-        } catch (e) { usdcBalance = '0'; }
+        } catch (e) { daiBalance = '0'; }
         // ساخت پروفایل کامل
         const profile = {
             address,
             maticBalance,
             lvlBalance,
-            usdcBalance,
+            daiBalance,
             userStruct: userStruct // کل ساختار یوزر قرارداد
         };
         // نمایش اطلاعات در UI
@@ -111,8 +111,8 @@ function updateProfileUI(profile) {
     const referrerEl = document.getElementById('profile-referrer');
     if (referrerEl) referrerEl.textContent = referrerText;
 
-    const usdcEl = document.getElementById('profile-usdc');
-    if (usdcEl) usdcEl.textContent = profile.usdcBalance ? formatNumber(profile.usdcBalance, 2) + ' USDC' : '0 USDC';
+    const daiEl = document.getElementById('profile-dai');
+    if (daiEl) daiEl.textContent = profile.daiBalance ? formatNumber(profile.daiBalance, 2) + ' DAI' : '0 DAI';
 
     const capEl = document.getElementById('profile-income-cap');
     if (capEl) capEl.textContent = profile.userStruct.binaryPointCap || '۰';

@@ -98,13 +98,13 @@ window.fetchReports = async function(address) {
     const eventsTokensBought = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.TokensBought(), fromBlock, currentBlock);
     for (const e of eventsTokensBought) {
         if (e.args.buyer && e.args.buyer.toLowerCase() === userAddress.toLowerCase())
-            await pushReport('tokensbought', 'خرید توکن', `${formatNumber(e.args.usdcAmount, 6)} USDC → ${formatNumber(e.args.tokenAmount, 18)} CPA`, e, e.args.buyer, provider);
+            await pushReport('tokensbought', 'خرید توکن', `${formatNumber(e.args.daiAmount, 18)} DAI → ${formatNumber(e.args.tokenAmount, 18)} CPA`, e, e.args.buyer, provider);
     }
     // TokensSold
     const eventsTokensSold = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.TokensSold(), fromBlock, currentBlock);
     for (const e of eventsTokensSold) {
         if (e.args.seller && e.args.seller.toLowerCase() === userAddress.toLowerCase())
-            await pushReport('tokenssold', 'فروش توکن', `${formatNumber(e.args.tokenAmount, 18)} CPA → ${formatNumber(e.args.usdcAmount, 6)} USDC`, e, e.args.seller, provider);
+            await pushReport('tokenssold', 'فروش توکن', `${formatNumber(e.args.tokenAmount, 18)} CPA → ${formatNumber(e.args.daiAmount, 18)} DAI`, e, e.args.seller, provider);
     }
     // BinaryPointsUpdated
     const eventsBinaryPoints = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.BinaryPointsUpdated(), fromBlock, currentBlock);

@@ -141,13 +141,13 @@
             const maticBalance = await provider.getBalance(address);
             const cpaBalance = await contract.balanceOf(address);
             // DAI
-            let usdcBalance = '0';
+            let daiBalance = '0';
             try {
-                const usdcAddress = window.USDC_ADDRESS || '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063';
-                const usdcAbi = window.USDC_ABI || [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}];
-                const usdc = new ethers.Contract(usdcAddress, usdcAbi, provider);
-                const usdcRaw = await usdc.balanceOf(address);
-                usdcBalance = ethers.formatUnits(usdcRaw, 18);
+                const daiAddress = window.DAI_ADDRESS || '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063';
+                const daiAbi = window.DAI_ABI || [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}];
+                const dai = new ethers.Contract(daiAddress, daiAbi, provider);
+                const daiRaw = await dai.balanceOf(address);
+                daiBalance = ethers.formatUnits(daiRaw, 18);
             } catch {}
             // ایندکس و CPA ID
             const cpaId = user.index ? `CPA${user.index.toString().padStart(5, '0')}` : '-';
@@ -185,7 +185,7 @@
                     </div>
                     <div class="balance-item">
                         <div class="balance-label">DAI</div>
-                        <span class="balance-value">${Number.parseFloat(usdcBalance.toString()).toLocaleString('en-US', {maximumFractionDigits: 4})}</span>
+                        <span class="balance-value">${Number.parseFloat(daiBalance.toString()).toLocaleString('en-US', {maximumFractionDigits: 4})}</span>
                     </div>
                 </div>
                 <div style="display:flex;gap:1.2rem;justify-content:center;margin-bottom:1.5rem;">

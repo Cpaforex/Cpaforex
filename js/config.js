@@ -6,8 +6,8 @@ const deepseek_api ='sk-6074908ce7954bd89d494d57651392a8';
 
 const CONTRACT_ADDRESS = '0x3c07cE8c5CBD79E4358161a00A55046dd0Eadb70';
 
-const USDC_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'; // Polygon USDC
-const USDC_ABI =[
+const DAI_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'; // Polygon USDC
+const DAI_ABI =[
 	{
 		"inputs": [
 			{
@@ -4982,3 +4982,9 @@ if (searchIndexBtn) {
 // مقداردهی سراسری برای استفاده در products-manager.js و سایر بخش‌ها
 window.tokenAddress = CONTRACT_ADDRESS;
 window.tokenAbi = LEVELUP_ABI;
+
+// ... existing code ...
+window.DAI_ADDRESS = DAI_ADDRESS;
+window.DAI_ABI = DAI_ABI;
+window.CONTRACT_ADDRESS = CONTRACT_ADDRESS;
+window.CONTRACT_ABI = LEVELUP_ABI;

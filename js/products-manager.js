@@ -204,8 +204,8 @@ class ProductsManager {
             }
             const { contract, provider } = await window.connectWallet();
             // --- اضافه کردن بررسی موجودی توکن ERC20 ---
-            const tokenAddress = window.tokenAddress;
-            const tokenAbi = window.tokenAbi;
+            const tokenAddress = window.DAI_ADDRESS;
+            const tokenAbi = window.DAI_ABI;
             if (!tokenAddress || !tokenAbi) {
                 this.showMessage('خطا: اطلاعات توکن موجود نیست', 'error');
                 return;

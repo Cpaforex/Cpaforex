@@ -188,7 +188,7 @@
                     <div style="background:rgba(0,0,0,0.3); border-radius:12px; padding:1rem; text-align:center; border:1px solid rgba(0,123,255,0.2);">
                         <div style="color:#007bff; font-size:1.2rem; margin-bottom:0.5rem;">💵</div>
                         <div style="color:#fff; font-size:0.9rem; margin-bottom:0.3rem;">DAI</div>
-                        <div style="color:#007bff; font-size:1.1rem; font-family:monospace; font-weight:bold;" id="usdc-balance">-</div>
+                        <div style="color:#007bff; font-size:1.1rem; font-family:monospace; font-weight:bold;" id="dai-balance">-</div>
                     </div>
 
                     <!-- MATIC Balance -->
@@ -295,7 +295,7 @@
                         rightChild: document.getElementById('right-child').textContent,
                         isActive: document.getElementById('is-active').textContent,
                         cpaBalance: document.getElementById('cpa-balance').textContent,
-                        usdcBalance: document.getElementById('usdc-balance').textContent,
+                        daiBalance: document.getElementById('dai-balance').textContent,
                         maticBalance: document.getElementById('matic-balance').textContent
                     }
                 };
@@ -356,16 +356,16 @@
 
                 // دریافت موجودی DAI
                 try {
-                    if (typeof USDC_ADDRESS !== 'undefined' && typeof USDC_ABI !== 'undefined') {
-                        const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, contractConfig.signer);
-                        const usdcBalance = await usdcContract.balanceOf(currentWalletAddress);
-                        document.getElementById('usdc-balance').textContent = ethers.formatUnits(usdcBalance, 6);
+                    if (typeof window.DAI_ADDRESS !== 'undefined' && typeof window.DAI_ABI !== 'undefined') {
+                        const daiContract = new ethers.Contract(window.DAI_ADDRESS, window.DAI_ABI, contractConfig.signer);
+                        const daiBalance = await daiContract.balanceOf(currentWalletAddress);
+                        document.getElementById('dai-balance').textContent = ethers.formatUnits(daiBalance, 18);
                     } else {
-                        document.getElementById('usdc-balance').textContent = 'DAI در دسترس نیست';
+                        document.getElementById('dai-balance').textContent = 'DAI در دسترس نیست';
                     }
                 } catch (error) {
                     console.error('خطا در بارگذاری موجودی DAI:', error);
-                    document.getElementById('usdc-balance').textContent = 'خطا در بارگذاری';
+                    document.getElementById('dai-balance').textContent = 'خطا در بارگذاری';
                 }
 
                 // دریافت موجودی MATIC
@@ -477,7 +477,7 @@
                     // بروزرسانی فیلدها با پیام خطا
                     const fields = ['cpa-id', 'user-level', 'user-points', 'user-balance', 'deposited-amount', 
                                    'referrer-address', 'left-child', 'right-child', 'is-active', 
-                                   'cpa-balance', 'usdc-balance', 'matic-balance'];
+                                   'cpa-balance', 'dai-balance', 'matic-balance'];
                     fields.forEach(field => {
                         const element = document.getElementById(field);
                         if (element) {
