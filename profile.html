@@ -147,7 +147,7 @@
                 const usdcAbi = window.USDC_ABI || [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}];
                 const usdc = new ethers.Contract(usdcAddress, usdcAbi, provider);
                 const usdcRaw = await usdc.balanceOf(address);
-                usdcBalance = ethers.formatUnits(usdcRaw, 6);
+                usdcBalance = ethers.formatUnits(usdcRaw, 18);
             } catch {}
             // ایندکس و CPA ID
             const cpaId = user.index ? `CPA${user.index.toString().padStart(5, '0')}` : '-';
