@@ -1,23 +1,28 @@
 // نمایش درخت باینری با lazy load: هر گره با کلیک expand می‌شود و فقط فرزندان همان گره نمایش داده می‌شوند
 
 function shortAddress(addr) {
-    if (!addr) return '-';
-    return addr.slice(0, 3) + '...' + addr.slice(-2);
+    if (!addr || addr === '-') return '-';
+    return addr.slice(0, 4) + '...' + addr.slice(-3);
 }
 
 function showUserPopup(address, user) {
     // تابع کوتاه‌کننده آدرس
     function shortAddress(addr) {
-        if (!addr) return '-';
-        return addr.slice(0, 6) + '...' + addr.slice(-4);
+        if (!addr || addr === '-') return '-';
+        return addr.slice(0, 4) + '...' + addr.slice(-3);
     }
-    // حذف popup قبلی
+    
+    // حذف popup قبلی اگر وجود دارد
     let existingPopup = document.getElementById('user-popup');
-    if (existingPopup) existingPopup.remove();
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+    
     // اطلاعات مورد نیاز
     const cpaId = user && user.index !== undefined && user.index !== null ? (window.generateCPAId ? window.generateCPAId(user.index) : user.index) : '-';
     const walletAddress = address || '-';
     const isActive = user && user.activated ? true : false;
+    
     // لیست struct
     const infoList = [
       {icon:'🎯', label:'امتیاز باینری', val:user.binaryPoints},
@@ -26,17 +31,19 @@ function showUserPopup(address, user) {
       {icon:'✅', label:'امتیاز دریافت‌شده', val:user.binaryPointsClaimed},
       {icon:'🤝', label:'درآمد رفرال', val:user.refclimed ? Math.floor(Number(user.refclimed) / 1e18) : 0},
       {icon:'💰', label:'سپرده کل', val:user.depositedAmount ? Math.floor(Number(user.depositedAmount) / 1e18) : 0},
-      {icon:'🟢', label:'CPA', val:'در حال بارگذاری...'},
-      {icon:'🟣', label:'MATIC', val:'در حال بارگذاری...'},
-      {icon:'💵', label:'USDC', val:'در حال بارگذاری...'},
       {icon:'⬅️', label:'امتیاز چپ', val:user.leftPoints},
       {icon:'➡️', label:'امتیاز راست', val:user.rightPoints}
     ];
-    const popup = document.createElement('div');
-    popup.id = 'user-popup';
-    popup.style = `
+
+    const popupEl = document.createElement('div');
+    popupEl.id = 'user-popup';
+    popupEl.style = `
       position: fixed;z-index: 9999;top: 64px;left: 0;right: 0;width: 100vw;min-width: 100vw;max-width: 100vw;background: rgba(24,28,42,0.97);display: flex;align-items: flex-start;justify-content: center;padding: 0.5rem 0.5vw 0.5rem 0.5vw;box-sizing: border-box;font-family: 'Montserrat', 'Noto Sans Arabic', monospace;font-size: 0.93rem;`;
-    popup.innerHTML = `
+    
+    // نمایش loading برای موجودی‌ها
+    const balanceSpinner = '<div style="display:inline-block;width:12px;height:12px;border:2px solid #00ff88;border-radius:50%;border-top-color:transparent;animation:spin 1s linear infinite;margin-right:5px;"></div>';
+    
+    popupEl.innerHTML = `
       <div class="user-info-card">
         <button class="close-btn" id="close-user-popup">×</button>
         <div class="user-info-btn-row">
@@ -47,11 +54,47 @@ function showUserPopup(address, user) {
         <ul class="user-info-list">
           ${infoList.map(i=>`<li><span>${i.icon}</span> <b>${i.label}:</b> ${i.val !== undefined && i.val !== null && i.val !== '' ? i.val : '-'}</li>`).join('')}
         </ul>
+        
+        <div class="token-balances-container">
+          <h3 class="balance-title">موجودی‌های زنده</h3>
+          <div class="balance-grid">
+            <div class="balance-item" id="cpa-balance" title="برای کپی کلیک کنید">
+              <div class="balance-icon">🟢</div>
+              <div class="balance-info">
+                <span class="balance-label">CPA</span>
+                <span class="balance-value copy-value" data-token="CPA">⏳</span>
+              </div>
+            </div>
+            <div class="balance-item" id="matic-balance" title="برای کپی کلیک کنید">
+              <div class="balance-icon">🟣</div>
+              <div class="balance-info">
+                <span class="balance-label">MATIC</span>
+                <span class="balance-value copy-value" data-token="MATIC">⏳</span>
+              </div>
+            </div>
+            <div class="balance-item" id="dai-balance" title="برای کپی کلیک کنید">
+              <div class="balance-icon">💵</div>
+              <div class="balance-info">
+                <span class="balance-label">DAI</span>
+                <span class="balance-value copy-value" data-token="DAI">⏳</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="wallet-info">
+          <div class="wallet-label">آدرس کیف پول:</div>
+          <div class="wallet-address copy-value" data-address="${walletAddress}" title="برای کپی کلیک کنید">
+            ${shortAddress(walletAddress)}
+          </div>
+        </div>
+        
         <div id="copy-msg" style="display:none;text-align:center;color:#00ff88;font-size:1em;margin-top:0.7em;">کپی شد!</div>
       </div>
     `;
-    document.body.appendChild(popup);
-    document.getElementById('close-user-popup').onclick = () => popup.remove();
+    document.body.appendChild(popupEl);
+    document.getElementById('close-user-popup').onclick = () => popupEl.remove();
+    
     // قابلیت کپی
     function showCopyMsg() {
       const msg = document.getElementById('copy-msg');
@@ -59,17 +102,89 @@ function showUserPopup(address, user) {
       msg.style.display = 'block';
       setTimeout(()=>{msg.style.display='none';}, 1200);
     }
+    
     document.getElementById('copy-cpa-id').onclick = function() {
       navigator.clipboard.writeText(cpaId+'');
       showCopyMsg();
     };
+    
     document.getElementById('copy-wallet-address').onclick = function() {
       navigator.clipboard.writeText(walletAddress+'');
       showCopyMsg();
     };
 
+    // نمایش پیام کپی
+    function showCopyTooltip(element, message = 'کپی شد!') {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'copy-tooltip';
+        tooltip.textContent = message;
+        
+        // موقعیت tooltip
+        const rect = element.getBoundingClientRect();
+        tooltip.style.top = `${rect.top - 30}px`;
+        tooltip.style.left = `${rect.left + (rect.width / 2)}px`;
+        
+        document.body.appendChild(tooltip);
+        
+        // حذف tooltip بعد از 1.5 ثانیه
+        setTimeout(() => {
+            tooltip.classList.add('fade-out');
+            setTimeout(() => tooltip.remove(), 300);
+        }, 1500);
+    }
+
+    // اضافه کردن قابلیت کپی به همه المان‌های کپی
+    document.querySelectorAll('.copy-value').forEach(element => {
+        element.addEventListener('click', async function() {
+            try {
+                let textToCopy;
+                
+                if (this.dataset.token) {
+                    // کپی موجودی توکن
+                    const value = this.textContent.trim();
+                    textToCopy = `${value} ${this.dataset.token}`;
+                } else if (this.dataset.address) {
+                    // کپی آدرس کیف پول
+                    textToCopy = this.dataset.address;
+                }
+                
+                if (textToCopy && textToCopy !== '-' && textToCopy !== '❌' && textToCopy !== '⏳') {
+                    await navigator.clipboard.writeText(textToCopy);
+                    showCopyTooltip(this);
+                }
+            } catch (error) {
+                console.warn('Error copying to clipboard:', error);
+            }
+        });
+    });
+
+    // دریافت موجودی‌های زنده
+    if (walletAddress !== '-') {
+        window.TokenBalances.getAllBalances(walletAddress).then(balances => {
+            const { cpa, dai, matic } = balances;
+            
+            // به‌روزرسانی موجودی CPA
+            document.querySelector('#cpa-balance .balance-value').textContent = cpa;
+            
+            // به‌روزرسانی موجودی MATIC
+            document.querySelector('#matic-balance .balance-value').textContent = matic;
+            
+            // به‌روزرسانی موجودی DAI
+            document.querySelector('#dai-balance .balance-value').textContent = dai;
+        }).catch(error => {
+            console.warn('Error fetching balances:', error);
+            document.querySelector('#cpa-balance .balance-value').textContent = '❌';
+            document.querySelector('#matic-balance .balance-value').textContent = '❌';
+            document.querySelector('#dai-balance .balance-value').textContent = '❌';
+        });
+    } else {
+        document.querySelector('#cpa-balance .balance-value').textContent = '-';
+        document.querySelector('#matic-balance .balance-value').textContent = '-';
+        document.querySelector('#dai-balance .balance-value').textContent = '-';
+    }
+
     async function getLiveBalances(addr) {
-        let cpa = '-', usdc = '-', matic = '-';
+        let cpa = '-', dai = '-', matic = '-';
         try {
             const { contract, provider } = await window.connectWallet();
             
@@ -83,15 +198,15 @@ function showUserPopup(address, user) {
                 }
             }
             
-            // دریافت موجودی USDC
+            // دریافت موجودی DAI
             try {
-                if (typeof USDC_ADDRESS !== 'undefined' && typeof USDC_ABI !== 'undefined') {
-                    const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider);
-                    let usdcRaw = await usdcContract.balanceOf(addr);
-                    usdc = (typeof ethers !== 'undefined') ? Number(ethers.formatUnits(usdcRaw, 6)).toFixed(2) : (Number(usdcRaw)/1e6).toFixed(2);
+                if (typeof DAI_ADDRESS !== 'undefined' && typeof DAI_ABI !== 'undefined') {
+                    const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, provider);
+                    let daiRaw = await daiContract.balanceOf(addr);
+                    dai = (typeof ethers !== 'undefined') ? Number(ethers.formatUnits(daiRaw, 6)).toFixed(2) : (Number(daiRaw)/1e6).toFixed(2);
                 }
             } catch(e) {
-                console.warn('خطا در دریافت موجودی USDC:', e);
+                console.warn('خطا در دریافت موجودی DAI:', e);
             }
             
             // دریافت موجودی MATIC
@@ -106,11 +221,11 @@ function showUserPopup(address, user) {
         } catch(e) {
             console.error('خطا در دریافت موجودی‌ها:', e);
         }
-        return {cpa, usdc, matic};
+        return {cpa, dai, matic};
     }
 
     (async function() {
-        const {cpa, usdc, matic} = await getLiveBalances(address);
+        const {cpa, dai, matic} = await getLiveBalances(address);
         // به‌روزرسانی موجودی‌ها در لیست
         const listItems = document.querySelectorAll('.user-info-list li');
         listItems.forEach(item => {
@@ -119,8 +234,8 @@ function showUserPopup(address, user) {
                 item.innerHTML = item.innerHTML.replace(/🟢 <b>CPA:<\/b> [^<]*/, `🟢 <b>CPA:</b> ${cpa}`);
             } else if (text.includes('🟣 MATIC:')) {
                 item.innerHTML = item.innerHTML.replace(/🟣 <b>MATIC:<\/b> [^<]*/, `🟣 <b>MATIC:</b> ${matic}`);
-            } else if (text.includes('💵 USDC:')) {
-                item.innerHTML = item.innerHTML.replace(/💵 <b>USDC:<\/b> [^<]*/, `💵 <b>USDC:</b> ${usdc}`);
+            } else if (text.includes('💵 DAI:')) {
+                item.innerHTML = item.innerHTML.replace(/💵 <b>DAI:<\/b> [^<]*/, `💵 <b>DAI:</b> ${dai}`);
             }
         });
     })();
@@ -240,7 +355,7 @@ async function renderVerticalNodeLazy(index, container, level = 0, autoExpand = 
                         depositedAmount: user.depositedAmount,
                         lvlBalance: 'در حال بارگذاری...',
                         maticBalance: 'در حال بارگذاری...',
-                        usdcBalance: 'در حال بارگذاری...',
+                        daiBalance: 'در حال بارگذاری...',
                         leftPoints: user.leftPoints,
                         rightPoints: user.rightPoints
                     }
@@ -771,7 +886,7 @@ window.showUserStructTypewriter = function(address, user) {
     `پاداش رفرال:  ${user.refclimed ? Math.floor(Number(user.refclimed) / 1e18) : '0'}`,
     `موجودی CPA:  ${user.lvlBalance ? user.lvlBalance : '0'}`,
     `موجودی POL:  ${user.maticBalance ? user.maticBalance : '0'}`,
-    `موجودی USDC:  ${user.usdcBalance ? user.usdcBalance : '0'}`
+    `موجودی DAI:  ${user.daiBalance ? user.daiBalance : '0'}`
   ];
   const popup = document.createElement('div');
   popup.id = 'user-popup';

@@ -53,6 +53,7 @@ function formatNumber(value, decimals = 18) {
 // جمع‌آوری همه ایونت‌ها
 window.fetchReports = async function(address) {
     const { contract, address: userAddress } = await connectWallet();
+    console.log('fetchReports: userAddress =', userAddress, 'contract =', contract);
     const provider = (contract.runner && contract.runner.provider) || contract.provider;
     const contractWithProvider = contract.connect ? contract.connect(provider) : contract;
     contractWithProvider.provider = provider; // تضمین provider معتبر برای safeQueryEvents
@@ -84,48 +85,59 @@ window.fetchReports = async function(address) {
     }
     // Activated
     const eventsActivated = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.Activated(), fromBlock, currentBlock);
+    console.log('Activated events:', eventsActivated.length);
     for (const e of eventsActivated) {
         if (e.args.user && e.args.user.toLowerCase() === userAddress.toLowerCase())
             await pushReport('activated', 'فعال‌سازی', formatNumber(e.args.amountCPA, 18) + ' CPA', e, e.args.user, provider);
     }
     // PurchaseKind
     const eventsPurchaseKind = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.PurchaseKind(), fromBlock, currentBlock);
+    console.log('PurchaseKind events:', eventsPurchaseKind.length);
     for (const e of eventsPurchaseKind) {
-        if (e.args.user && e.args.user.toLowerCase() === userAddress.toLowerCase())
-            await pushReport('purchase', 'خرید', formatNumber(e.args.amountCPA, 18) + ' CPA', e, e.args.user, provider);
+        await pushReport('purchase', 'خرید', formatNumber(e.args.amountCPA, 18) + ' CPA', e, e.args.user, provider);
     }
     // TokensBought
     const eventsTokensBought = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.TokensBought(), fromBlock, currentBlock);
+    console.log('TokensBought events:', eventsTokensBought.length);
     for (const e of eventsTokensBought) {
         if (e.args.buyer && e.args.buyer.toLowerCase() === userAddress.toLowerCase())
             await pushReport('tokensbought', 'خرید توکن', `${formatNumber(e.args.daiAmount, 18)} DAI → ${formatNumber(e.args.tokenAmount, 18)} CPA`, e, e.args.buyer, provider);
     }
     // TokensSold
     const eventsTokensSold = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.TokensSold(), fromBlock, currentBlock);
+    console.log('TokensSold events:', eventsTokensSold.length);
     for (const e of eventsTokensSold) {
         if (e.args.seller && e.args.seller.toLowerCase() === userAddress.toLowerCase())
             await pushReport('tokenssold', 'فروش توکن', `${formatNumber(e.args.tokenAmount, 18)} CPA → ${formatNumber(e.args.daiAmount, 18)} DAI`, e, e.args.seller, provider);
     }
     // BinaryPointsUpdated
     const eventsBinaryPoints = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.BinaryPointsUpdated(), fromBlock, currentBlock);
+    console.log('BinaryPointsUpdated events:', eventsBinaryPoints.length);
     for (const e of eventsBinaryPoints) {
-        await pushReport('binarypoints', 'به‌روزرسانی امتیاز باینری', `${formatNumber(e.args.newPoints, 18)} امتیاز (سقف: ${formatNumber(e.args.newCap, 18)})`, e, e.args.user, provider);
+        if (e.args.user && e.args.user.toLowerCase() === userAddress.toLowerCase())
+            await pushReport('binarypoints', 'به‌روزرسانی امتیاز باینری', `${formatNumber(e.args.newPoints, 18)} امتیاز (سقف: ${formatNumber(e.args.newCap, 18)})`, e, e.args.user, provider);
     }
     // BinaryRewardDistributed
     const eventsBinaryReward = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.BinaryRewardDistributed(), fromBlock, currentBlock);
+    console.log('BinaryRewardDistributed events:', eventsBinaryReward.length);
     for (const e of eventsBinaryReward) {
-        await pushReport('binaryreward', 'دریافت پاداش باینری', `${formatNumber(e.args.claimerReward, 18)} CPA`, e, e.args.claimer, provider);
+        if (e.args.claimer && e.args.claimer.toLowerCase() === userAddress.toLowerCase())
+            await pushReport('binaryreward', 'دریافت پاداش باینری', `${formatNumber(e.args.claimerReward, 18)} CPA`, e, e.args.claimer, provider);
     }
-    // BinaryPoolUpdated
+    // BinaryPoolUpdated (عمومی)
     const eventsBinaryPool = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.BinaryPoolUpdated(), fromBlock, currentBlock);
+    console.log('BinaryPoolUpdated events:', eventsBinaryPool.length);
     for (const e of eventsBinaryPool) {
         await pushReport('binarypool', 'به‌روزرسانی استخر باینری', `${formatNumber(e.args.addedAmount, 18)} CPA (سایز جدید: ${formatNumber(e.args.newPoolSize, 18)})`, e, null, provider);
     }
     // TreeStructureUpdated
     const eventsTree = await window.safeQueryEvents(contractWithProvider, contractWithProvider.filters.TreeStructureUpdated(), fromBlock, currentBlock);
+    console.log('TreeStructureUpdated events:', eventsTree.length);
     for (const e of eventsTree) {
-        let posLabel = e.args.position == 0 ? 'فرزند چپ' : e.args.position == 1 ? 'فرزند راست' : `موقعیت: ${e.args.position}`;
-        await pushReport('tree', 'تغییر ساختار شبکه', posLabel, e, e.args.user, provider);
+        if (e.args.user && e.args.user.toLowerCase() === userAddress.toLowerCase()) {
+            let posLabel = e.args.position == 0 ? 'فرزند چپ' : e.args.position == 1 ? 'فرزند راست' : `موقعیت: ${e.args.position}`;
+            await pushReport('tree', 'تغییر ساختار شبکه', posLabel, e, e.args.user, provider);
+        }
     }
     // Transfer
     const eventsTransfer = await contractWithProvider.queryFilter(contractWithProvider.filters.Transfer(), fromBlock, currentBlock);
@@ -241,12 +253,12 @@ async function getReportSentence(report) {
         let toPromise = '';
         if (report.address && typeof report.address === 'object') {
             if (window.contractConfig && window.contractConfig.contract) {
-                fromPromise = displayAddress(report.address.from, window.contractConfig.contract, window.contractConfig.CONTRACT_ADDRESS).then(addr => {
+                fromPromise = displayAddress(report.address.from, window.contractConfig.contract, window.contractConfig.CPA_ADDRESS).then(addr => {
                     if (addr.startsWith('CPA')) return addr;
                     if (addr === 'قرارداد') return addr;
                     return ultraShortAddress(report.address.from);
                 });
-                toPromise = displayAddress(report.address.to, window.contractConfig.contract, window.contractConfig.CONTRACT_ADDRESS).then(addr => {
+                toPromise = displayAddress(report.address.to, window.contractConfig.contract, window.contractConfig.CPA_ADDRESS).then(addr => {
                     if (addr.startsWith('CPA')) return addr;
                     if (addr === 'قرارداد') return addr;
                     return ultraShortAddress(report.address.to);
@@ -283,7 +295,7 @@ async function getReportSentence(report) {
         case 'tree':
             return `${time} یک کاربر جدید در سمت ${amount} شما ثبت شد.`;
         case 'approval':
-            return displayAddress(report.address, window.contractConfig.contract, window.contractConfig.CONTRACT_ADDRESS).then(addr => `${time} شما مجوز انتقال ${amount} را صادر کردید. آدرس مقابل: <span class='wallet-address'>${addr}</span>`);
+            return displayAddress(report.address, window.contractConfig.contract, window.contractConfig.CPA_ADDRESS).then(addr => `${time} شما مجوز انتقال ${amount} را صادر کردید. آدرس مقابل: <span class='wallet-address'>${addr}</span>`);
         case 'indextransfer':
             return `${time} انتقال ایندکس ${amount}`;
         case 'monthlyreward':
