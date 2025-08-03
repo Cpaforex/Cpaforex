@@ -76,11 +76,36 @@
       </div>
       <div class="form-group">
         <label for="new-user-address">آدرس کاربر جدید</label>
-         <div style="font-size:0.8rem;color:#718096;margin-bottom:6px;background:rgba(113,128,150,0.1);padding:6px;border-radius:4px;">
-           👤 آدرس کیف پول کاربری که می‌خواهید ثبت‌نام کنید. این آدرس نباید قبلاً ثبت‌نام شده باشد.
-         </div>
+        <div style="font-size:0.8rem;color:#718096;margin-bottom:6px;background:rgba(113,128,150,0.1);padding:6px;border-radius:4px;">
+          👤 آدرس کیف پول کاربری که می‌خواهید ثبت‌نام کنید. این آدرس نباید قبلاً ثبت‌نام شده باشد.
+        </div>
         <input type="text" id="new-user-address" class="register-form-input" placeholder="0x..." autocomplete="off">
       </div>
+      
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const addressInput = document.getElementById('new-user-address');
+          
+          // وقتی کاربر روی اینپوت کلیک کند
+          addressInput.addEventListener('click', async function() {
+            try {
+              // خواندن محتوای کلیپبورد
+              const clipboardText = await navigator.clipboard.readText();
+              
+              // بررسی اینکه آیا متن کپی شده شبیه آدرس اتریوم است
+              if (clipboardText.match(/^0x[a-fA-F0-9]{40}$/)) {
+                addressInput.value = clipboardText;
+                
+                // نمایش پیام موفقیت آمیز (اختیاری)
+                alert('آدرس از کلیپبورد با موفقیت وارد شد!');
+              }
+            } catch (err) {
+              console.error('خطا در دسترسی به کلیپبورد:', err);
+              // در صورت نیاز می‌توانید یک پیام خطا به کاربر نمایش دهید
+            }
+          });
+        });
+      </script>
       <div class="info-box" id="register-info" style="background:rgba(28,28,40,0.97);color:#fff;font-weight:bold;font-size:1.08rem;box-shadow:0 2px 8px #a786ff22;margin-bottom:18px;">
         <div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(167,134,255,0.3);">
           <div style="color:#a786ff;font-size:0.9rem;margin-bottom:4px;">📊 اطلاعات ثبت‌نام:</div>

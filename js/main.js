@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ]);
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
         set('circulating-supply', Number(totalSupply) / 1e18);
-        set('dashboard-dai-balance', Number(daiBalance) / 1e6);
+        set('dashboard-dai-balance', Number(daiBalance) / 1e18);
         set('contract-token-balance', Number(tokenBalance) / 1e18);
         set('dashboard-wallets-count', Number(wallets));
         // set('total-points', Math.floor(Number(totalPoints) / 1e18).toLocaleString('en-US'));

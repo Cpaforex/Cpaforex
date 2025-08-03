@@ -3231,7 +3231,7 @@ window.getUserProfile = async function() {
 			try {
 				const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, provider);
 				const daiRaw = await daiContract.balanceOf(address);
-				daiBalance = (Number(daiRaw) / 1e6).toFixed(2);
+				daiBalance = (Number(daiRaw) / 1e18).toFixed(2);
 			} catch (e) {
 				daiBalance = '0';
 			}

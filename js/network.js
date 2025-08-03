@@ -203,7 +203,7 @@ function showUserPopup(address, user) {
                 if (typeof DAI_ADDRESS !== 'undefined' && typeof DAI_ABI !== 'undefined') {
                     const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, provider);
                     let daiRaw = await daiContract.balanceOf(addr);
-                    dai = (typeof ethers !== 'undefined') ? Number(ethers.formatUnits(daiRaw, 6)).toFixed(2) : (Number(daiRaw)/1e6).toFixed(2);
+                    dai = (typeof ethers !== 'undefined') ? Number(ethers.formatUnits(daiRaw, 6)).toFixed(2) : (Number(daiRaw)/1e18).toFixed(2);
                 }
             } catch(e) {
                 console.warn('خطا در دریافت موجودی DAI:', e);
