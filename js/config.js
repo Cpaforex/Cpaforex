@@ -5,7 +5,7 @@ window.deepseek_api = deepseek_api;
 
 // تنظیمات قرارداد LevelUp
 
-const CPA_ADDRESS = '0x31445529038Fc94CE4F883443a5433b6D5C1D5D0';
+const CPA_ADDRESS = '0x422487D45b6f532d42B3b8345FFB9f73859A44Fd';
 window.CPA_ADDRESS = CPA_ADDRESS;
 
 const DAI_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'; // Polygon DAI
@@ -1197,6 +1197,29 @@ const CPA_ABI =[
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amountCPA",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "payout",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "seller",
+				"type": "address"
+			}
+		],
+		"name": "purchase",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
@@ -1544,29 +1567,6 @@ const CPA_ABI =[
 		"type": "event"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "amountCPA",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "payout",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "seller",
-				"type": "address"
-			}
-		],
-		"name": "purchase",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -1599,6 +1599,24 @@ const CPA_ABI =[
 			}
 		],
 		"name": "registerAndActivate",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "referrer",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "newUser",
+				"type": "address"
+			}
+		],
+		"name": "registerFree",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -1878,6 +1896,19 @@ const CPA_ABI =[
 	},
 	{
 		"inputs": [],
+		"name": "daiToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "decimals",
 		"outputs": [
 			{
@@ -1942,7 +1973,7 @@ const CPA_ABI =[
 	},
 	{
 		"inputs": [],
-		"name": "getContractTokenBalance",
+		"name": "getContractdaiBalance",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -1955,7 +1986,7 @@ const CPA_ABI =[
 	},
 	{
 		"inputs": [],
-		"name": "getContractDAIBalance",
+		"name": "getContractTokenBalance",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -2283,19 +2314,6 @@ const CPA_ABI =[
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "daiToken",
-		"outputs": [
-			{
-				"internalType": "contract IERC20",
-				"name": "",
-				"type": "address"
 			}
 		],
 		"stateMutability": "view",
