@@ -72,15 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    // حذف مقداردهی مستقیم به dashboard-terminal-info برای جلوگیری از تداخل تایپ‌رایتر
-    // if (document.getElementById('dashboard-terminal-info')) {
-    //     document.getElementById('dashboard-terminal-info').textContent =
-    //         `Total Points: ${window.contractStats.totalPoints}\n` +
-    //         `DAI Balance: ${window.contractStats.daiBalance}\n` +
-    //         `Token Balance: ${window.contractStats.tokenBalance}\n` +
-    //         `Wallets: ${window.contractStats.wallets}\n` +
-    //         `Total Supply: ${window.contractStats.totalSupply}`;
-    // }
+
 
     // نمایش آدرس قرارداد در کارت داشبورد (بدون دکمه، فقط با کلیک روی آدرس)
     const contractAddress = (window.contractConfig && window.contractConfig.CPA_ADDRESS) ? window.contractConfig.CPA_ADDRESS : (typeof CPA_ADDRESS !== 'undefined' ? CPA_ADDRESS : '');

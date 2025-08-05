@@ -96,9 +96,8 @@ class SwapManager {
                     <p style="margin:5px 0;color:#555;"><strong>سقف خرید فعلی:</strong> ${maxBuy.toLocaleString('en-US', {maximumFractionDigits:2})} DAI</p>
                     <p style="margin:5px 0;color:#555;"><strong>کارمزد خرید:</strong> ۲٪ کل</p>
                     <ul style="margin:5px 0;padding-left:20px;color:#555;">
-                        <li>۰.۵٪ برای توسعه‌دهنده</li>
-                        <li>۰.۵٪ برای معرف</li>
-                        <li>۱٪ برای پشتوانه قرارداد</li>
+                        <li>0.5٪ برای توسعه‌دهنده</li>
+                        <li>1.5٪ برای پشتوانه قرارداد</li>
                     </ul>
                     <p style="margin:5px 0;color:#2e7d32;"><strong>سهم شما: ۹۸٪ از مبلغ خرید به توکن تبدیل می‌شود</strong></p>
                 </div>`;
@@ -118,9 +117,8 @@ class SwapManager {
                     <p style="margin:5px 0;color:#555;"><strong>سقف فروش فعلی:</strong> ${maxSell.toLocaleString('en-US', {maximumFractionDigits:2})} توکن</p>
                     <p style="margin:5px 0;color:#555;"><strong>کارمزد فروش:</strong> ۲٪ کل</p>
                     <ul style="margin:5px 0;padding-left:20px;color:#555;">
-                        <li>۰.۵٪ برای توسعه‌دهنده</li>
-                        <li>۰.۵٪ برای معرف</li>
-                        <li>۱٪ برای پشتوانه قرارداد</li>
+                        <li>0.5٪ برای توسعه‌دهنده</li>
+                        <li>1.5٪ برای پشتوانه قرارداد</li>
                     </ul>
                     <p style="margin:5px 0;color:#e65100;"><strong>سهم شما: ۹۸٪ از مقدار فروش به DAI تبدیل می‌شود</strong></p>
                 </div>`;
