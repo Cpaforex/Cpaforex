@@ -64,6 +64,17 @@
 <body>
   <div class="transfer-ownership-container">
     <h2>انتقال مالکیت موقعیت</h2>
+    
+    <!-- نمایش موجودی‌ها -->
+    <div style="background:#f8f9ff;border:1px solid #00bfae;color:#2c3e50;padding:1rem 0.8rem;border-radius:8px;margin-bottom:1.2rem;font-size:0.9rem;">
+      <b>💰 موجودی‌های شما:</b><br>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:0.5rem;margin-top:0.5rem;">
+        <span>🪙 CPA: <strong id="user-cpa-balance">-</strong></span>
+        <span>💵 DAI: <strong id="user-dai-balance">-</strong></span>
+        <span>⚡ MATIC: <strong id="user-matic-balance">-</strong></span>
+      </div>
+    </div>
+    
     <div style="background:#fffbe6;border:1px solid #ffe082;color:#b26a00;padding:1rem 0.8rem;border-radius:8px;margin-bottom:1.2rem;font-size:0.98rem;line-height:1.8;">
       <b>هشدار مهم:</b><br>
       با انتقال مالکیت، تمام دسترسی‌ها و کنترل این موقعیت به آدرس جدید منتقل می‌شود و شما دیگر هیچ دسترسی‌ای به این اکانت نخواهید داشت.<br>
@@ -82,6 +93,52 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
   <script src="js/config.js"></script>
   <script>
+    // تابع بروزرسانی اطلاعات خودکار
+    async function autoRefreshBalances() {
+      try {
+        if (!window.contractConfig || !window.contractConfig.contract || !window.contractConfig.signer) {
+          return;
+        }
+        
+        const userAddress = window.contractConfig.address;
+        const contract = window.contractConfig.contract;
+        const signer = window.contractConfig.signer;
+        
+        // بروزرسانی اطلاعات کاربر از قرارداد
+        const user = await contract.users(userAddress);
+        const userTree = await contract.getUserTree(userAddress);
+        
+        // نمایش اطلاعات کاربر (اگر المان‌ها موجود باشند)
+        const updateElement = (id, value) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = value;
+        };
+        
+        // بروزرسانی موجودی‌ها
+        try {
+          // موجودی CPA
+          const cpaBalance = await contract.balanceOf(userAddress);
+          updateElement('user-cpa-balance', parseFloat(ethers.formatEther(cpaBalance)).toFixed(2) + ' CPA');
+          
+          // موجودی DAI
+          const daiContract = new ethers.Contract(window.DAI_ADDRESS, window.DAI_ABI, signer);
+          const daiBalance = await daiContract.balanceOf(userAddress);
+          updateElement('user-dai-balance', parseFloat(ethers.formatUnits(daiBalance, 18)).toFixed(2) + ' DAI');
+          
+          // موجودی MATIC
+          const maticBalance = await signer.provider.getBalance(userAddress);
+          updateElement('user-matic-balance', parseFloat(ethers.formatEther(maticBalance)).toFixed(4) + ' MATIC');
+          
+        } catch (balanceError) {
+          console.warn('خطا در بروزرسانی موجودی‌ها:', balanceError);
+        }
+        
+        console.log('✅ اطلاعات خودکار بروزرسانی شد');
+      } catch (error) {
+        console.warn('خطا در بروزرسانی خودکار:', error);
+      }
+    }
+
     async function transferIndexOwnership(newOwner, statusEl, btn) {
       if (!window.contractConfig || !window.contractConfig.contract) {
         statusEl.textContent = '❌ اتصال کیف پول برقرار نیست.';
@@ -108,6 +165,9 @@
         await tx.wait();
         statusEl.className = 'status success';
         statusEl.textContent = '✅ انتقال مالکیت با موفقیت انجام شد!';
+        
+        // بروزرسانی اطلاعات بعد از انتقال موفق
+        setTimeout(autoRefreshBalances, 2000);
       } catch (error) {
         let msg = error && error.message ? error.message : error;
         statusEl.className = 'status error';
@@ -129,6 +189,8 @@
         btn.disabled = false;
       }
     }
+    
+    // رویداد submit فرم
     document.getElementById('transferOwnershipForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const newOwner = document.getElementById('newOwnerAddress').value.trim();
@@ -136,6 +198,25 @@
       const btn = document.getElementById('transferOwnershipBtn');
       statusEl.className = 'status';
       transferIndexOwnership(newOwner, statusEl, btn);
+    });
+
+    // بروزرسانی خودکار هنگام بارگذاری صفحه
+    document.addEventListener('DOMContentLoaded', function() {
+      // بررسی وضعیت اتصال کیف پول
+      if (window.contractConfig && window.contractConfig.contract) {
+        autoRefreshBalances();
+      } else {
+        // انتظار برای اتصال کیف پول
+        const checkConnection = setInterval(() => {
+          if (window.contractConfig && window.contractConfig.contract) {
+            autoRefreshBalances();
+            clearInterval(checkConnection);
+          }
+        }, 1000);
+        
+        // متوقف کردن بررسی بعد از 10 ثانیه
+        setTimeout(() => clearInterval(checkConnection), 10000);
+      }
     });
   </script>
   <script src="js/navbar.js"></script>

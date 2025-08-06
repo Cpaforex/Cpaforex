@@ -529,7 +529,20 @@
           <div class="transfer-row">
             <label for="transferAmount">مقدار:</label>
             <input type="number" id="transferAmount" placeholder="مقدار را وارد کنید" min="0" step="any" required>
-            <small style="color:#b8c1ec;font-size:0.85rem;margin-top:0.3rem;display:block;">مقدار انتقال را وارد کنید (حداقل 0.001)</small>
+            <button type="button" id="maxAmountBtn" style="
+              background: linear-gradient(90deg,#ff6b6b,#ee5a52);
+              color: #fff;
+              border: none;
+              border-radius: 6px;
+              padding: 0.4rem 0.8rem;
+              font-size: 0.8rem;
+              cursor: pointer;
+              margin-top: 0.5rem;
+              transition: all 0.3s ease;
+              width: auto;
+              display: inline-block;
+            ">🔥 حداکثر موجودی</button>
+            <small style="color:#b8c1ec;font-size:0.85rem;margin-top:0.3rem;display:block;">مقدار انتقال را وارد کنید یا روی "حداکثر" کلیک کنید</small>
           </div>
           <div class="transfer-row">
             <label for="transferToken">نوع توکن:</label>
@@ -542,7 +555,7 @@
           </div>
           
           <!-- Balance Check -->
-          <div style="background:rgba(167,134,255,0.1);border-radius:8px;padding:1rem;margin-bottom:1rem;">
+          <div style="background:rgba(167,134,255,0.1);border-radius:8px;padding:1rem;margin-bottom:1rem;" class="balance-check">
             <h4 style="color:#a786ff;margin-bottom:0.8rem;">💰 موجودی فعلی شما:</h4>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
               <div style="text-align:center;">
@@ -1016,9 +1029,96 @@
 
   <!-- کنترل نمایش ورودی آدرس مقصد -->
   <script>
+    // تابع بروزرسانی خودکار موجودی‌های ترنسفر
+    async function autoRefreshTransferBalances() {
+      try {
+        if (window.updateTransferBalancesOnConnect) {
+          await window.updateTransferBalancesOnConnect();
+          console.log('✅ موجودی‌های ترنسفر خودکار بروزرسانی شد');
+        }
+      } catch (error) {
+        console.warn('خطا در بروزرسانی خودکار موجودی‌های ترنسفر:', error);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const transferForm = document.getElementById('transferForm');
       if (!transferForm) return;
+
+      // بروزرسانی خودکار موجودی‌ها هنگام بارگذاری صفحه
+      const initTransferBalances = () => {
+        if (window.contractConfig && window.contractConfig.contract) {
+          autoRefreshTransferBalances();
+        } else {
+          // انتظار برای اتصال کیف پول
+          const checkConnection = setInterval(() => {
+            if (window.contractConfig && window.contractConfig.contract) {
+              autoRefreshTransferBalances();
+              clearInterval(checkConnection);
+            }
+          }, 1000);
+          
+          // متوقف کردن بررسی بعد از 15 ثانیه
+          setTimeout(() => clearInterval(checkConnection), 15000);
+        }
+      };
+
+      // شروع بروزرسانی
+      initTransferBalances();
+
+      // دکمه حداکثر
+      const maxAmountBtn = document.getElementById('maxAmountBtn');
+      const transferAmountInput = document.getElementById('transferAmount');
+      const transferTokenSelect = document.getElementById('transferToken');
+
+      if (maxAmountBtn && transferAmountInput && transferTokenSelect) {
+        maxAmountBtn.addEventListener('click', function() {
+          const selectedToken = transferTokenSelect.value;
+          let maxAmount = '0';
+          
+          // دریافت موجودی بر اساس توکن انتخاب شده
+          if (selectedToken === 'dai') {
+            const daiBalanceEl = document.getElementById('transfer-dai-balance');
+            if (daiBalanceEl && daiBalanceEl.textContent !== '-' && daiBalanceEl.textContent !== 'خطا' && daiBalanceEl.textContent !== 'متصل نیست') {
+              maxAmount = parseFloat(daiBalanceEl.textContent).toString();
+            }
+          } else if (selectedToken === 'pol') {
+            const polBalanceEl = document.getElementById('transfer-poly-balance');
+            if (polBalanceEl && polBalanceEl.textContent !== '-' && polBalanceEl.textContent !== 'خطا' && polBalanceEl.textContent !== 'متصل نیست') {
+              // برای POL، 0.01 کمتر از موجودی (برای کارمزد شبکه)
+              const polBalance = parseFloat(polBalanceEl.textContent);
+              maxAmount = Math.max(0, polBalance - 0.01).toString();
+            }
+          } else if (selectedToken === 'cpa') {
+            const cpaBalanceEl = document.getElementById('transfer-cpa-balance');
+            if (cpaBalanceEl && cpaBalanceEl.textContent !== '-' && cpaBalanceEl.textContent !== 'خطا' && cpaBalanceEl.textContent !== 'متصل نیست') {
+              maxAmount = parseFloat(cpaBalanceEl.textContent).toString();
+            }
+          }
+          
+          // تنظیم مقدار در فیلد ورودی
+          if (parseFloat(maxAmount) > 0) {
+            transferAmountInput.value = maxAmount;
+            // تغییر متن دکمه به صورت موقت
+            const originalText = maxAmountBtn.textContent;
+            maxAmountBtn.textContent = '✓ تنظیم شد';
+            maxAmountBtn.style.background = 'linear-gradient(90deg,#00ff88,#00cc66)';
+            setTimeout(() => {
+              maxAmountBtn.textContent = originalText;
+              maxAmountBtn.style.background = 'linear-gradient(90deg,#ff6b6b,#ee5a52)';
+            }, 1500);
+          } else {
+            // نمایش پیام خطا
+            maxAmountBtn.textContent = '❌ موجودی کافی نیست';
+            maxAmountBtn.style.background = 'linear-gradient(90deg,#666,#555)';
+            setTimeout(() => {
+              maxAmountBtn.textContent = 'حداکثر';
+              maxAmountBtn.style.background = 'linear-gradient(90deg,#ff6b6b,#ee5a52)';
+            }, 2000);
+          }
+        });
+      }
+
       transferForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const transferBtn = transferForm.querySelector('button[type="submit"]');
@@ -1058,9 +1158,9 @@
             status.textContent = 'انتقال با موفقیت انجام شد!\nکد تراکنش: ' + tx.hash;
             status.className = 'transfer-status success';
           } else if (token === 'dai') {
-            // انتقال DAI
+            // انتقال DAI - تصحیح decimal به 18
             const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, window.contractConfig.signer);
-            const decimals = 6; // DAI has 18 decimals
+            const decimals = 18; // DAI has 18 decimals, not 6
             const parsedAmount = ethers.parseUnits(amount.toString(), decimals);
             const tx = await daiContract.transfer(to, parsedAmount);
             await tx.wait();
@@ -1075,6 +1175,9 @@
             status.className = 'transfer-status success';
           }
           transferForm.reset();
+          
+          // بروزرسانی موجودی‌ها بعد از انتقال موفق
+          setTimeout(autoRefreshTransferBalances, 2000);
         } catch (error) {
           let msg = error && error.message ? error.message : error;
           if (msg.includes('user rejected')) msg = 'تراکنش توسط کاربر لغو شد';

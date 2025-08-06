@@ -4205,13 +4205,15 @@ window.updateDashboardStats = async function() {
 	  safeUpdate('dashboard-cashback-value', 'N/A');
 	}
 
-	// DAI CONTRACT BALANCE - Using contract's getContractDAIBalance function
+	// DAI CONTRACT BALANCE - Using contract's getContractdaiBalance function
 	try {
 	  console.log('💵 Fetching DAI contract balance...');
 	  let daiBalance;
 	  
-	  // Try different possible function names
-	  if (typeof contract.getContractDAIBalance === 'function') {
+	  // Try different possible function names (corrected function name)
+	  if (typeof contract.getContractdaiBalance === 'function') {
+		daiBalance = await contract.getContractdaiBalance();
+	  } else if (typeof contract.getContractDAIBalance === 'function') {
 		daiBalance = await contract.getContractDAIBalance();
 	  } else {
 		// Fallback to direct DAI contract call
@@ -4223,7 +4225,8 @@ window.updateDashboardStats = async function() {
 		}
 	  }
 	  
-	  const formattedDai = parseFloat(ethers.formatUnits(daiBalance, 6)).toLocaleString('en-US', {maximumFractionDigits: 2});
+	  // Fixed: DAI has 18 decimals, not 6
+	  const formattedDai = parseFloat(ethers.formatUnits(daiBalance, 18)).toLocaleString('en-US', {maximumFractionDigits: 2});
 	  safeUpdate('dashboard-dai-balance', formattedDai + ' DAI');
 	  console.log('✅ DAI contract balance updated:', formattedDai + ' DAI');
 
@@ -4390,7 +4393,7 @@ async function updatePriceChart() {
 	}
 }
 
-// Returns the DAI balance of the main contract (CPA_ADDRESS) as a string in DAI units (6 decimals)
+// Returns the DAI balance of the main contract (CPA_ADDRESS) as a string in DAI units (18 decimals)
 async function getContractDAIBalance() {
   if (typeof ethers === 'undefined') throw new Error('ethers.js not loaded');
   const provider = (window.contractConfig && window.contractConfig.contract && window.contractConfig.contract.provider)
@@ -4401,7 +4404,7 @@ async function getContractDAIBalance() {
   if (!provider) throw new Error('No provider');
   const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, provider);
   const balanceRaw = await daiContract.balanceOf(CPA_ADDRESS);
-  return ethers.formatUnits(balanceRaw, 6); // returns as string, e.g. '123.456789'
+  return ethers.formatUnits(balanceRaw, 18); // Fixed: DAI has 18 decimals, not 6
 }
 
 // ... existing code ...

@@ -854,8 +854,19 @@ async function updateDAIContractBalance() {
       contract = conn && conn.contract ? conn.contract : null;
     }
     if (!contract) return;
-    const daiBalance = await contract.getContractDAIBalance();
-    const daiFormatted = (Number(daiBalance) / 1e6).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    // Try correct function name first, then fallback
+    let daiBalance;
+    if (typeof contract.getContractdaiBalance === 'function') {
+      daiBalance = await contract.getContractdaiBalance();
+    } else if (typeof contract.getContractDAIBalance === 'function') {
+      daiBalance = await contract.getContractDAIBalance();
+    } else {
+      // Fallback to direct DAI contract call
+      const daiContract = new ethers.Contract(window.DAI_ADDRESS, window.DAI_ABI, contract.provider);
+      daiBalance = await daiContract.balanceOf(contract.target);
+    }
+    // Fixed: DAI has 18 decimals, not 6
+    const daiFormatted = (Number(daiBalance) / 1e18).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     const el = document.getElementById('dashboard-dai-balance');
     if (el) el.textContent = daiFormatted + ' DAI';
   } catch (e) {

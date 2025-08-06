@@ -55,8 +55,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           totalPoints
         ] = await Promise.all([
           contract.totalSupply(),
-          contract.daiBalance ? contract.daiBalance() : Promise.resolve(0),
-          contract.tokenBalance ? contract.tokenBalance() : Promise.resolve(0),
+          // Use correct function name for DAI balance
+          contract.getContractdaiBalance ? contract.getContractdaiBalance() : 
+            (new ethers.Contract(window.DAI_ADDRESS, window.DAI_ABI, contract.provider)).balanceOf(contract.target),
+          contract.balanceOf ? contract.balanceOf(contract.target) : Promise.resolve(0),
           contract.wallets(),
           contract.totalClaimableBinaryPoints()
         ]);
@@ -2980,11 +2982,11 @@ async function updateTransferBalances(contract, address, provider) {
         // دریافت موجودی DAI
         let daiBalance = '-';
         try {
-            const DAI_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+            const DAI_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'; // آدرس صحیح DAI در قرارداد
             const DAI_ABI = ["function balanceOf(address) view returns (uint256)"];
             const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, provider);
             const daiBal = await daiContract.balanceOf(address);
-            daiBalance = parseFloat(ethers.formatUnits(daiBal, 6)).toFixed(2);
+            daiBalance = parseFloat(ethers.formatUnits(daiBal, 18)).toFixed(2); // DAI has 18 decimals
             console.log('DAI balance:', daiBalance);
         } catch (e) {
             console.error('Error getting DAI balance:', e);
@@ -3068,54 +3070,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     
-    // اضافه کردن دکمه به‌روزرسانی دستی موجودی‌ها
-    const transferContainer = document.querySelector('.transfer-container');
-    if (transferContainer) {
-        const refreshButton = document.createElement('button');
-        refreshButton.innerHTML = '🔄 به‌روزرسانی موجودی‌ها';
-        refreshButton.style.cssText = `
-            background: linear-gradient(90deg, #a786ff, #8b6bff);
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            cursor: pointer;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        `;
-        
-        refreshButton.onclick = async function() {
-            try {
-                refreshButton.textContent = 'در حال به‌روزرسانی...';
-                refreshButton.disabled = true;
-                
-                if (window.updateTransferBalancesOnConnect) {
-                    await window.updateTransferBalancesOnConnect();
-                }
-                
-                refreshButton.textContent = '✅ به‌روزرسانی شد';
-                setTimeout(() => {
-                    refreshButton.textContent = '🔄 به‌روزرسانی موجودی‌ها';
-                    refreshButton.disabled = false;
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Error refreshing balances:', error);
-                refreshButton.textContent = '❌ خطا در به‌روزرسانی';
-                setTimeout(() => {
-                    refreshButton.textContent = '🔄 به‌روزرسانی موجودی‌ها';
-                    refreshButton.disabled = false;
-                }, 2000);
-            }
-        };
-        
-        // اضافه کردن دکمه به ابتدای فرم
-        const form = transferContainer.querySelector('#transferForm');
-        if (form) {
-            form.insertBefore(refreshButton, form.firstChild);
-        }
-    }
+    // دکمه بروزرسانی دستی حذف شد - اکنون بروزرسانی خودکار است
     
     // اضافه کردن event listener برای دکمه اتصال کیف پول در تب ترنسفر
     document.addEventListener('click', function(e) {
