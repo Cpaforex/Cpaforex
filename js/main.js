@@ -350,6 +350,9 @@ async function connectWallet() {
     }
 }
 
+// تعریف تابع connectWallet در window برای استفاده در فایل‌های دیگر
+window.connectWallet = connectWallet;
+
 // تابع به‌روزرسانی ناوبار بر اساس وضعیت کاربر
 async function updateNavbarBasedOnUserStatus() {
     try {
@@ -3180,15 +3183,18 @@ window.stopTransferBalanceAutoRefresh = function() {
 
 // تابع تولید ID بر اساس ایندکس کاربر
 function generateCPAId(index) {
-    if (!index || index === 0) return 'CPA00000';
+    if (!index || index === 0) return '0';
     
     // تبدیل به عدد
     const numIndex = typeof index === 'bigint' ? Number(index) : parseInt(index);
-    if (isNaN(numIndex) || numIndex < 0) return 'CPA00000';
+    if (isNaN(numIndex) || numIndex < 0) return '0';
     
-    // تولید ID با فرمت CPA + 5 رقم
-    return `CPA${numIndex.toString().padStart(5, '0')}`;
+    // تولید ID با فرمت ساده - فقط عدد
+    return numIndex.toString();
 }
+
+// تعریف تابع generateCPAId در window برای استفاده در فایل‌های دیگر
+window.generateCPAId = generateCPAId;
 
 // تابع نمایش ID در گوشه بالا سمت راست - غیرفعال شده
 function displayCPAIdInCorner(index) {

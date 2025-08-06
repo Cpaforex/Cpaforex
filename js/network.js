@@ -1,11 +1,23 @@
 // نمایش درخت باینری با lazy load: هر گره با کلیک expand می‌شود و فقط فرزندان همان گره نمایش داده می‌شوند
 
+// متغیرهای سراسری برای مدیریت رندر درخت
+let lastRenderedIndex = null;
+let isRenderingTree = false;
+let lastRenderedTime = 0;
+
+// تابع fallback برای generateCPAId اگر موجود نباشد
+if (!window.generateCPAId) {
+    window.generateCPAId = function(index) {
+        return `CPA-${index}`;
+    };
+}
+
 function shortAddress(addr) {
     if (!addr || addr === '-') return '-';
     return addr.slice(0, 4) + '...' + addr.slice(-3);
 }
 
-function showUserPopup(address, user) {
+async function showUserPopup(address, user) {
     // تابع کوتاه‌کننده آدرس
     function shortAddress(addr) {
         if (!addr || addr === '-') return '-';
@@ -19,7 +31,8 @@ function showUserPopup(address, user) {
     }
     
     // اطلاعات مورد نیاز
-    const cpaId = user && user.index !== undefined && user.index !== null ? (window.generateCPAId ? window.generateCPAId(user.index) : user.index) : '-';
+    const cpaId = user && user.index !== undefined && user.index !== null ? 
+        (window.generateCPAId ? window.generateCPAId(user.index) : user.index) : '-';
     const walletAddress = address || '-';
     const isActive = user && user.activated ? true : false;
     
@@ -345,16 +358,29 @@ function showUserPopup(address, user) {
 
 // تابع جدید: رندر عمودی ساده با حفظ رفتارها
 async function renderVerticalNodeLazy(index, container, level = 0, autoExpand = false) {
+    console.log(`🔄 renderVerticalNodeLazy called with index: ${index}, level: ${level}`);
     try {
+        console.log('🔄 Getting contract connection...');
         const { contract } = await window.connectWallet();
         if (!contract) throw new Error('No contract connection available');
+        console.log('✅ Contract connection obtained');
+        
+        console.log(`🔄 Getting address for index: ${index}`);
         let address = await contract.indexToAddress(index);
+        console.log('✅ Address obtained:', address);
+        
         if (!address || address === '0x0000000000000000000000000000000000000000') {
+            console.log('⚠️ Empty address, rendering empty node');
             renderEmptyNodeVertical(index, container, level);
             return;
         }
+        
+        console.log('🔄 Getting user data for address:', address);
         let user = await contract.users(address);
+        console.log('✅ User data obtained:', user);
+        
         if (!user) {
+            console.log('⚠️ No user data, rendering empty node');
             renderEmptyNodeVertical(index, container, level);
             return;
         }
@@ -385,9 +411,10 @@ async function renderVerticalNodeLazy(index, container, level = 0, autoExpand = 
         nodeDiv.style.background = 'rgba(35,41,70,0.98)';
         nodeDiv.style.borderRadius = '12px';
         nodeDiv.style.padding = '0.7em 1.5em';
-        nodeDiv.style.minWidth = '320px';
-        nodeDiv.style.maxWidth = '320px';
-        nodeDiv.style.height = '64px';
+        nodeDiv.style.minWidth = '200px';
+        nodeDiv.style.maxWidth = '400px';
+        nodeDiv.style.minHeight = '50px';
+        nodeDiv.style.height = 'auto';
         nodeDiv.style.color = '#00ff88';
         nodeDiv.style.fontFamily = 'monospace';
         nodeDiv.style.fontSize = '1.08em';
@@ -414,9 +441,7 @@ async function renderVerticalNodeLazy(index, container, level = 0, autoExpand = 
         }
         // حذف ساخت علامت سوال کنار گره
         nodeDiv.innerHTML = `
-            <span style="color:#a786ff;font-size:0.85em;margin-left:1em;">Level ${level}</span>
-            <span style="font-size:1.2em;">👤</span>
-            <span style="margin-right:0.7em;">${cpaId}</span>
+            <span style="margin-right:0.7em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${cpaId}</span>
         `;
         if (expandBtn) nodeDiv.prepend(expandBtn);
         nodeDiv.addEventListener('click', function(e) {
@@ -660,16 +685,18 @@ function renderEmptyNodeVertical(index, container, level) {
     emptyNode.style.marginBottom = '0.5em';
     emptyNode.style.background = 'rgba(255,255,255,0.04)';
     emptyNode.style.borderRadius = '8px';
-    emptyNode.style.padding = '0.4em 1em';
+    emptyNode.style.padding = '0.5em 1.2em';
+    emptyNode.style.minWidth = '150px';
+    emptyNode.style.maxWidth = '300px';
+    emptyNode.style.minHeight = '40px';
+    emptyNode.style.height = 'auto';
     emptyNode.style.color = '#888';
     emptyNode.style.fontFamily = 'monospace';
     emptyNode.style.fontSize = '1em';
     emptyNode.style.cursor = 'pointer';
     emptyNode.style.opacity = '0.7';
     emptyNode.innerHTML = `
-        <span style="color:#a786ff;font-size:0.85em;margin-left:1em;">Level ${level}</span>
-        <span style="font-size:1.2em;opacity:0.5;">❓</span>
-        <span style="margin-right:0.7em;">${index}</span>
+        <span style="margin-right:0.7em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${index}</span>
     `;
     emptyNode.title = 'ثبت‌نام زیرمجموعه جدید';
     emptyNode.onmouseover = function() { this.style.opacity = '1'; };
@@ -703,27 +730,35 @@ function renderEmptyNodeVertical(index, container, level) {
 }
 // جایگزینی رندر اصلی درخت با مدل عمودی
 window.renderSimpleBinaryTree = async function() {
+    console.log('🔄 Starting renderSimpleBinaryTree...');
     const container = document.getElementById('network-tree');
     if (!container) {
         console.error('❌ Network tree container not found');
         return;
     }
+    console.log('✅ Network tree container found');
     container.innerHTML = '';
     container.style.overflow = 'auto';
     container.style.whiteSpace = 'normal';
     container.style.padding = '2rem 0';
     container.style.display = 'block';
     try {
+        console.log('🔄 Connecting to wallet...');
         const { contract, address } = await window.connectWallet();
         if (!contract || !address) {
             throw new Error('اتصال کیف پول در دسترس نیست');
         }
+        console.log('✅ Wallet connected, address:', address);
+        console.log('🔄 Getting user data...');
         const user = await contract.users(address);
         if (!user || !user.index) {
             throw new Error('کاربر پیدا نشد یا ثبت‌نام نشده است');
         }
+        console.log('✅ User data retrieved, index:', user.index);
         // در window.renderSimpleBinaryTree مقدار autoExpand فقط برای ریشه true باشد:
+        console.log('🔄 Rendering vertical node...');
         await renderVerticalNodeLazy(BigInt(user.index), container, 0, true);
+        console.log('✅ Vertical node rendered successfully');
         
         // ذخیره درخت در دیتابیس بعد از رندر
         if (window.saveCurrentNetworkTree) {
@@ -750,13 +785,16 @@ if (typeof renderSimpleBinaryTree === 'function') {
 // اضافه کردن تابع initializeNetworkTab به window
 // window.initializeNetworkTab = initializeNetworkTab; // این خط حذف شد چون تابع بعداً تعریف می‌شود
 
+
+
 // اضافه کردن event listener برای تب network
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔄 DOMContentLoaded event fired for network.js');
+    
     // بررسی اینکه آیا در تب network هستیم
     const networkTab = document.getElementById('tab-network-btn');
     if (networkTab) {
         networkTab.addEventListener('click', function() {
-            console.log('🔄 Network tab clicked, initializing...');
             setTimeout(() => {
                 if (typeof window.initializeNetworkTab === 'function') {
                     window.initializeNetworkTab();
@@ -768,7 +806,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // بررسی اینکه آیا در تب network هستیم و شبکه رندر نشده
     const networkSection = document.getElementById('main-network');
     if (networkSection && networkSection.style.display !== 'none') {
-        console.log('🔄 Network section visible on load, initializing...');
         setTimeout(() => {
             if (typeof window.initializeNetworkTab === 'function') {
                 window.initializeNetworkTab();
@@ -782,7 +819,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
                 const visibleNetworkSection = document.getElementById('main-network');
                 if (visibleNetworkSection && visibleNetworkSection.style.display !== 'none') {
-                    console.log('🔄 Network section became visible, initializing...');
                     setTimeout(() => {
                         if (typeof window.initializeNetworkTab === 'function') {
                             window.initializeNetworkTab();
@@ -798,6 +834,8 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(networkSection, { attributes: true, attributeFilter: ['style'] });
     }
 });
+
+
 
 // تابع رفرش درخت باینری بعد از تایید متامسک
 window.refreshBinaryTreeAfterMetaMask = async function() {
@@ -841,7 +879,9 @@ window.initializeNetworkTab = async function() {
     console.log('🔄 Initializing network tab...');
     
     // پاک کردن درخت قبل از رندر جدید
-    window.clearBinaryTree();
+    if (typeof window.clearBinaryTree === 'function') {
+        window.clearBinaryTree();
+    }
     
     // بررسی وجود container
     const container = document.getElementById('network-tree');
@@ -854,6 +894,19 @@ window.initializeNetworkTab = async function() {
     
     // نمایش وضعیت بارگذاری
     container.innerHTML = '<div style="color:#00ccff;text-align:center;padding:2rem;">🔄 در حال بارگذاری درخت شبکه...</div>';
+    
+    // تست ساده برای بررسی اتصال
+    try {
+        console.log('🔄 Testing wallet connection...');
+        const { contract, address } = await window.connectWallet();
+        console.log('✅ Wallet connection test successful');
+        console.log('Contract:', contract);
+        console.log('Address:', address);
+    } catch (error) {
+        console.error('❌ Wallet connection test failed:', error);
+        container.innerHTML = `<div style="color:#ff4444;text-align:center;padding:2rem;">❌ خطا در اتصال کیف پول<br><small style="color:#ccc;">${error.message}</small></div>`;
+        return;
+    }
     
     // retry logic
     let retryCount = 0;

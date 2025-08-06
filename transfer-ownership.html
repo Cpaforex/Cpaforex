@@ -81,10 +81,33 @@
       این عملیات غیرقابل بازگشت است. لطفاً قبل از انجام، از صحت آدرس مقصد اطمینان حاصل کنید.<br>
       <b>توصیه:</b> آدرس مقصد را با دقت و چند بار بررسی کنید. در صورت اشتباه، امکان بازگردانی وجود ندارد.<br>
     </div>
+    
+    <div style="background:#f0f8ff;border:1px solid #4a90e2;color:#2c3e50;padding:1rem 0.8rem;border-radius:8px;margin-bottom:1.2rem;font-size:0.9rem;line-height:1.6;">
+      <b>💡 راهنمای کپی و چسباندن:</b><br>
+      • 📋 کپی آدرس وارد شده یا آدرس فعلی شما<br>
+      • 📄 چسباندن آدرس از کلیپ‌برد<br>
+      • 🗑️ پاک کردن فیلد آدرس<br>
+      • 👤 پر کردن آدرس فعلی شما<br>
+      <small>کلیدهای میانبر: Ctrl+C (کپی)، Ctrl+V (چسباندن)، Ctrl+X (پاک کردن)، Ctrl+F (آدرس فعلی)</small>
+    </div>
     <form id="transferOwnershipForm">
       <div class="form-group">
         <label for="newOwnerAddress">آدرس مالک جدید</label>
-        <input type="text" id="newOwnerAddress" placeholder="مثال: 0x..." autocomplete="off" required>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="text" id="newOwnerAddress" placeholder="مثال: 0x..." autocomplete="off" required style="flex: 1;">
+          <button type="button" id="copyAddressBtn" style="width: auto; padding: 0.7rem 1rem; font-size: 0.9rem;" title="کپی آدرس">
+            📋
+          </button>
+          <button type="button" id="pasteAddressBtn" style="width: auto; padding: 0.7rem 1rem; font-size: 0.9rem;" title="چسباندن از کلیپ‌برد">
+            📄
+          </button>
+          <button type="button" id="clearAddressBtn" style="width: auto; padding: 0.7rem 1rem; font-size: 0.9rem;" title="پاک کردن">
+            🗑️
+          </button>
+          <button type="button" id="fillCurrentAddressBtn" style="width: auto; padding: 0.7rem 1rem; font-size: 0.9rem;" title="پر کردن آدرس فعلی">
+            👤
+          </button>
+        </div>
       </div>
       <button type="submit" id="transferOwnershipBtn">انتقال مالکیت</button>
       <div class="status" id="transferOwnershipStatus"></div>
@@ -189,6 +212,120 @@
         btn.disabled = false;
       }
     }
+    
+    // تابع کپی کردن آدرس
+    async function copyAddressToClipboard() {
+      const addressInput = document.getElementById('newOwnerAddress');
+      const address = addressInput.value.trim();
+      
+      if (!address) {
+        // اگر آدرسی وارد نشده، آدرس فعلی کاربر را کپی کن
+        if (window.contractConfig && window.contractConfig.address) {
+          try {
+            await navigator.clipboard.writeText(window.contractConfig.address);
+            showCopyStatus('✅ آدرس فعلی شما کپی شد', 'success');
+          } catch (error) {
+            showCopyStatus('❌ خطا در کپی کردن آدرس', 'error');
+          }
+        } else {
+          showCopyStatus('❌ آدرس وارد نشده و اتصال کیف پول برقرار نیست', 'error');
+        }
+        return;
+      }
+      
+      // کپی کردن آدرس وارد شده
+      try {
+        await navigator.clipboard.writeText(address);
+        showCopyStatus('✅ آدرس کپی شد', 'success');
+      } catch (error) {
+        showCopyStatus('❌ خطا در کپی کردن آدرس', 'error');
+      }
+    }
+    
+    // تابع چسباندن آدرس از کلیپ‌برد
+    async function pasteAddressFromClipboard() {
+      try {
+        const clipboardText = await navigator.clipboard.readText();
+        const addressInput = document.getElementById('newOwnerAddress');
+        
+        // بررسی اینکه آیا متن کپی شده آدرس اتریوم معتبر است
+        if (clipboardText && /^0x[a-fA-F0-9]{40}$/.test(clipboardText.trim())) {
+          addressInput.value = clipboardText.trim();
+          showCopyStatus('✅ آدرس از کلیپ‌برد چسبانده شد', 'success');
+        } else {
+          showCopyStatus('❌ محتوای کلیپ‌برد آدرس اتریوم معتبر نیست', 'error');
+        }
+      } catch (error) {
+        showCopyStatus('❌ خطا در خواندن از کلیپ‌برد', 'error');
+      }
+    }
+    
+    // نمایش وضعیت کپی
+    function showCopyStatus(message, type) {
+      const statusEl = document.getElementById('transferOwnershipStatus');
+      statusEl.className = `status ${type}`;
+      statusEl.textContent = message;
+      
+      // پاک کردن پیام بعد از 3 ثانیه
+      setTimeout(() => {
+        if (statusEl.textContent === message) {
+          statusEl.className = 'status';
+          statusEl.textContent = '';
+        }
+      }, 3000);
+    }
+    
+    // رویداد کلیک روی دکمه کپی
+    document.getElementById('copyAddressBtn').addEventListener('click', copyAddressToClipboard);
+    
+    // تابع پاک کردن آدرس
+    function clearAddress() {
+      const addressInput = document.getElementById('newOwnerAddress');
+      addressInput.value = '';
+      showCopyStatus('✅ فیلد آدرس پاک شد', 'success');
+    }
+    
+    // تابع پر کردن خودکار آدرس فعلی کاربر
+    function fillCurrentUserAddress() {
+      if (window.contractConfig && window.contractConfig.address) {
+        const addressInput = document.getElementById('newOwnerAddress');
+        addressInput.value = window.contractConfig.address;
+        showCopyStatus('✅ آدرس فعلی شما در فیلد قرار گرفت', 'success');
+      }
+    }
+    
+    // رویداد کلیک روی دکمه چسباندن
+    document.getElementById('pasteAddressBtn').addEventListener('click', pasteAddressFromClipboard);
+    
+    // رویداد کلیک روی دکمه پاک کردن
+    document.getElementById('clearAddressBtn').addEventListener('click', clearAddress);
+    
+    // رویداد کلیک روی دکمه پر کردن آدرس فعلی
+    document.getElementById('fillCurrentAddressBtn').addEventListener('click', fillCurrentUserAddress);
+    
+    // کلیدهای میانبر
+    document.addEventListener('keydown', function(e) {
+      // Ctrl+V برای چسباندن
+      if (e.ctrlKey && e.key === 'v') {
+        e.preventDefault();
+        pasteAddressFromClipboard();
+      }
+      // Ctrl+C برای کپی کردن
+      if (e.ctrlKey && e.key === 'c') {
+        e.preventDefault();
+        copyAddressToClipboard();
+      }
+      // Ctrl+X برای پاک کردن
+      if (e.ctrlKey && e.key === 'x') {
+        e.preventDefault();
+        clearAddress();
+      }
+      // Ctrl+F برای پر کردن آدرس فعلی
+      if (e.ctrlKey && e.key === 'f') {
+        e.preventDefault();
+        fillCurrentUserAddress();
+      }
+    });
     
     // رویداد submit فرم
     document.getElementById('transferOwnershipForm').addEventListener('submit', function(e) {

@@ -570,23 +570,27 @@
     <link rel="stylesheet" href="css/mobile-user-popup.css">
     
     <script>
-        // Initialize when page loads
+                // Initialize when page loads
         document.addEventListener('DOMContentLoaded', async function() {
             try {
-                console.log('🌳 Professional tree page loaded');
-                
                 // Try to load network data automatically
                 setTimeout(async () => {
                     try {
-                        console.log('🔄 Loading network data...');
-                        
                         // Initialize network tab
                         if (typeof window.initializeNetworkTab === 'function') {
                             await window.initializeNetworkTab();
+                        } else if (typeof window.renderSimpleBinaryTree === 'function') {
+                            await window.renderSimpleBinaryTree();
                         } else {
-                            console.log('🔄 Network tab function not found, trying direct render...');
-                            if (typeof window.renderSimpleBinaryTree === 'function') {
-                                await window.renderSimpleBinaryTree();
+                            // نمایش پیام خطا به کاربر
+                            const container = document.getElementById('network-tree');
+                            if (container) {
+                                container.innerHTML = `
+                                    <div style="color:#ff4444;text-align:center;padding:2rem;">
+                                        ❌ خطا در بارگذاری درخت شبکه<br>
+                                        <small style="color:#ccc;">توابع مورد نیاز در دسترس نیستند</small>
+                                    </div>
+                                `;
                             }
                         }
                         
