@@ -2162,7 +2162,8 @@ window.showRegisterForm = async function(referrerAddress, defaultNewWallet, conn
         try {
           if (window.getRegPrice) {
             const regPrice = await window.getRegPrice(contract);
-            requiredDai = parseFloat(window.ethers.formatUnits(regPrice, 18)).toFixed(0) + ' CPA';
+            let priceValue = parseFloat(window.ethers.formatUnits(regPrice, 18));
+            requiredDai = Math.round(priceValue) + ' CPA'; // گرد کردن بدون اعشار
           } else {
             requiredDai = '...';
           }

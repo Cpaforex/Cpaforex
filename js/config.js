@@ -10,7 +10,7 @@ window.CPA_ADDRESS = CPA_ADDRESS;
 
 const DAI_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'; // Polygon DAI
 window.DAI_ADDRESS = DAI_ADDRESS;
-const DAI_ABI =[
+const DAI_ABI = [
 	{
 		"inputs": [
 			{
@@ -34,11 +34,6 @@ const DAI_ABI =[
 		],
 		"stateMutability": "nonpayable",
 		"type": "function"
-	},
-	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
 	},
 	{
 		"inputs": [

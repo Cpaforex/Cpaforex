@@ -376,16 +376,90 @@ class SwapManager {
             return;
         }
         
-        if (direction.value === 'dai-to-cpa') {
-            amount.value = this.userBalances.dai.toFixed(2);
-            console.log('✅ مقدار حداکثر DAI تنظیم شد:', this.userBalances.dai.toFixed(2));
-        } else if (direction.value === 'cpa-to-dai') {
-            amount.value = this.userBalances.cpa.toFixed(6);
-            console.log('✅ مقدار حداکثر CPA تنظیم شد:', this.userBalances.cpa.toFixed(6));
+        try {
+            if (direction.value === 'dai-to-cpa') {
+                // محاسبه سقف خرید هوشمند
+                const contract = window.contractConfig.contract;
+                const daiAddress = window.DAI_ADDRESS;
+                const daiAbi = window.DAI_ABI;
+                
+                if (!contract || !daiAddress || !daiAbi) {
+                    throw new Error('تنظیمات قرارداد ناقص است');
+                }
+                
+                const daiContract = new ethers.Contract(daiAddress, daiAbi, window.contractConfig.signer);
+                const daiBalance = await daiContract.balanceOf(contract.target);
+                const daiBalanceNum = parseFloat(ethers.formatUnits(daiBalance, 18));
+                
+                // محاسبه سقف خرید بر اساس موجودی قرارداد
+                let maxBuy;
+                if (daiBalanceNum <= 100000) {
+                    maxBuy = 1000;
+                } else {
+                    maxBuy = daiBalanceNum * 0.01;
+                }
+                
+                // انتخاب کمترین مقدار بین موجودی کاربر و سقف مجاز
+                const maxAmount = Math.min(this.userBalances.dai, maxBuy);
+                amount.value = maxAmount.toFixed(2);
+                
+                console.log('✅ حداکثر خرید هوشمند:', {
+                    userBalance: this.userBalances.dai.toFixed(2),
+                    buyLimit: maxBuy.toFixed(2),
+                    finalAmount: maxAmount.toFixed(2)
+                });
+                
+            } else if (direction.value === 'cpa-to-dai') {
+                // محاسبه سقف فروش هوشمند
+                const contract = window.contractConfig.contract;
+                const daiAddress = window.DAI_ADDRESS;
+                const daiAbi = window.DAI_ABI;
+                
+                if (!contract || !daiAddress || !daiAbi) {
+                    throw new Error('تنظیمات قرارداد ناقص است');
+                }
+                
+                const daiContract = new ethers.Contract(daiAddress, daiAbi, window.contractConfig.signer);
+                const daiBalance = await daiContract.balanceOf(contract.target);
+                const daiBalanceNum = parseFloat(ethers.formatUnits(daiBalance, 18));
+                
+                const totalSupply = await contract.totalSupply();
+                const totalSupplyNum = parseFloat(ethers.formatUnits(totalSupply, 18));
+                
+                // محاسبه سقف فروش بر اساس موجودی DAI قرارداد
+                let maxSell;
+                if (daiBalanceNum >= 500) {
+                    maxSell = totalSupplyNum * 0.01;
+                } else {
+                    maxSell = totalSupplyNum * 0.5;
+                }
+                
+                // انتخاب کمترین مقدار بین موجودی کاربر و سقف مجاز
+                const maxAmount = Math.min(this.userBalances.cpa, maxSell);
+                amount.value = maxAmount.toFixed(6);
+                
+                console.log('✅ حداکثر فروش هوشمند:', {
+                    userBalance: this.userBalances.cpa.toFixed(6),
+                    sellLimit: maxSell.toFixed(6),
+                    finalAmount: maxAmount.toFixed(6)
+                });
+            }
+            
+            await this.updateSwapPreview();
+            console.log('✅ پیش‌نمایش بعد از تنظیم حداکثر هوشمند به‌روزرسانی شد');
+            
+        } catch (error) {
+            console.error('❌ خطا در محاسبه حداکثر هوشمند:', error);
+            
+            // در صورت خطا، از روش قبلی استفاده کن
+            if (direction.value === 'dai-to-cpa') {
+                amount.value = this.userBalances.dai.toFixed(2);
+            } else if (direction.value === 'cpa-to-dai') {
+                amount.value = this.userBalances.cpa.toFixed(6);
+            }
+            
+            await this.updateSwapPreview();
         }
-        
-        await this.updateSwapPreview();
-        console.log('✅ پیش‌نمایش بعد از تنظیم حداکثر به‌روزرسانی شد');
     }
 
     setUIBusy(busy) {

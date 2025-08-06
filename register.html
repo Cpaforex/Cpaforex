@@ -279,7 +279,10 @@
         let regCost = '...';
         if (window.getRegPrice) {
           let cost = await window.getRegPrice(contract);
-          regCost = cost ? (typeof ethers !== 'undefined' ? ethers.formatEther(cost) : (Number(cost)/1e18).toFixed(2)) : '...';
+          if (cost) {
+            let costValue = typeof ethers !== 'undefined' ? ethers.formatEther(cost) : (Number(cost)/1e18);
+            regCost = Math.round(parseFloat(costValue)).toString(); // حذف اعشار و گرد کردن
+          }
         }
         document.getElementById('register-cost').textContent = regCost;
         // موجودی متیک

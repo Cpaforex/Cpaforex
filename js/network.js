@@ -477,7 +477,12 @@ async function renderVerticalNodeLazy(index, container, level = 0, autoExpand = 
                     // مقدار مورد نیاز برای ثبت‌نام
                     if (window.getRegPrice) {
                       let cost = await window.getRegPrice(contract);
-                      registerCost = cost ? (typeof ethers !== 'undefined' ? ethers.formatEther(cost) : (Number(cost)/1e18).toFixed(2)) : '...';
+                      if (cost) {
+                        let costValue = typeof ethers !== 'undefined' ? ethers.formatEther(cost) : (Number(cost)/1e18);
+                        registerCost = Math.round(parseFloat(costValue)).toString(); // حذف اعشار و گرد کردن
+                      } else {
+                        registerCost = '...';
+                      }
                     }
                     // موجودی متیک
                     if (provider && myAddress) {
