@@ -8,8 +8,13 @@ window.deepseek_api = deepseek_api;
 const CPA_ADDRESS = '0x422487D45b6f532d42B3b8345FFB9f73859A44Fd';
 window.CPA_ADDRESS = CPA_ADDRESS;
 
-const DAI_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'; // Polygon DAI
-window.DAI_ADDRESS = DAI_ADDRESS;
+// برای تست از DAI استفاده می‌کنیم ولی نام‌ها USDC هستند
+const DAI_ADDRESS_FOR_TEST = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'; // Polygon DAI (for testing)
+const USDC_ADDRESS_REAL = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'; // Real USDC address
+
+// استفاده از DAI برای تست
+window.USDC_ADDRESS = DAI_ADDRESS_FOR_TEST;
+window.DAI_ADDRESS = DAI_ADDRESS_FOR_TEST;
 const DAI_ABI = [
 	{
 		"inputs": [
@@ -3136,21 +3141,21 @@ window.autoLoadNetworkStats = async function() {
 		// بارگذاری آمار شبکه
 		await loadNetworkStats(connection.contract);
 		
-		// تنظیم interval برای بارگذاری مجدد هر 5 دقیقه
-		if (!window.networkStatsInterval) {
-			window.networkStatsInterval = setInterval(async () => {
-				if (!document.hidden) {
-					try {
-						const conn = await window.connectWallet();
-						if (conn && conn.contract) {
-							await loadNetworkStats(conn.contract);
-						}
-					} catch (error) {
-						console.warn('Auto-load network stats error:', error);
-					}
-				}
-			}, 5 * 60 * 1000); // 5 دقیقه
-		}
+		// تنظیم interval برای بارگذاری مجدد غیرفعال شد - فقط رفرش دستی
+		// if (!window.networkStatsInterval) {
+		// 	window.networkStatsInterval = setInterval(async () => {
+		// 		if (!document.hidden) {
+		// 			try {
+		// 				const conn = await window.connectWallet();
+		// 				if (conn && conn.contract) {
+		// 					await loadNetworkStats(conn.contract);
+		// 				}
+		// 			} catch (error) {
+		// 				console.warn('Auto-load network stats error:', error);
+		// 			}
+		// 		}
+		// 	}, 5 * 60 * 1000); // 5 دقیقه
+		// }
 	} catch (error) {
 		console.warn('Auto-load network stats failed:', error);
 	}
@@ -3242,9 +3247,9 @@ window.getUserProfile = async function() {
 			// دریافت موجودی DAI
 			let daiBalance = '0';
 			try {
-				const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, provider);
-				const daiRaw = await daiContract.balanceOf(address);
-				daiBalance = (Number(daiRaw) / 1e18).toFixed(2);
+					  const daiContract = new ethers.Contract(DAI_ADDRESS_FOR_TEST, DAI_ABI, provider);
+	  const daiRaw = await daiContract.balanceOf(address);
+	  daiBalance = (Number(daiRaw) / 1e18).toFixed(2); // DAI has 18 decimals (display as USDC)
 			} catch (e) {
 				daiBalance = '0';
 			}
@@ -4034,14 +4039,14 @@ async function refreshTotalSupply() {
 
 	const totalSupplyNum = Number(ethers.formatUnits(totalSupply, 18));
 	const contractBalanceNum = Number(ethers.formatUnits(contractBalance, 18));
-	const tokenPriceNum = Number(ethers.formatUnits(tokenPrice, 6)); // قیمت با 6 رقم اعشار (DAI)
+			const tokenPriceNum = Number(ethers.formatUnits(tokenPrice, 18)); // قیمت با 18 رقم اعشار (DAI)
 
 	const elTotalSupply = document.getElementById('total-supply');
-	if (elTotalSupply) elTotalSupply.innerText = totalSupplyNum.toLocaleString('en-US', {maximumFractionDigits: 4}) + ' CPA';
+	if (elTotalSupply) elTotalSupply.innerText = totalSupplyNum.toLocaleString('en-US', {maximumFractionDigits: 4}); // حذف پسوند CPA
 	const elContractBalance = document.getElementById('contract-balance');
-	if (elContractBalance) elContractBalance.innerText = contractBalanceNum.toLocaleString('en-US', {maximumFractionDigits: 4}) + ' CPA';
-	document.getElementById('supply-diff').innerText = (totalSupplyNum - contractBalanceNum).toLocaleString('en-US', {maximumFractionDigits: 4}) + ' CPA';
-	document.getElementById('total-supply-value').innerText = (totalSupplyNum * tokenPriceNum).toLocaleString('en-US', {maximumFractionDigits: 2}) + ' DAI';
+	if (elContractBalance) elContractBalance.innerText = contractBalanceNum.toLocaleString('en-US', {maximumFractionDigits: 4}); // حذف پسوند CPA
+	document.getElementById('supply-diff').innerText = (totalSupplyNum - contractBalanceNum).toLocaleString('en-US', {maximumFractionDigits: 4}); // حذف پسوند CPA
+	document.getElementById('total-supply-value').innerText = (totalSupplyNum * tokenPriceNum).toLocaleString('en-US', {maximumFractionDigits: 2}); // حذف پسوند DAI
   } catch (e) {
 	document.getElementById('total-supply').innerText = 'خطا';
 	document.getElementById('contract-balance').innerText = 'خطا';
@@ -4104,25 +4109,33 @@ window.updateDashboardStats = async function() {
 	  console.error('❌ Basic contract call failed:', e);
 	}
 
-	// Helper function to safely update element (حفظ مقدار قبلی)
-	const safeUpdate = (id, value) => {
-	  const el = document.getElementById(id);
-	  if (el) {
-		if (value !== undefined && value !== null && value !== 'Error' && value !== 'در دسترس نیست') {
-		  el.innerText = value;
-		} // اگر مقدار جدید معتبر نبود، مقدار قبلی را نگه دار
-	  }
+	// Helper function to safely update element (بروزرسانی هوشمند)
+		const safeUpdate = (id, value) => {
+		// استفاده از Dashboard Loading Manager برای بروزرسانی smooth
+		if (window.dashboardLoadingManager) {
+			// حذف loading state و بروزرسانی مقدار
+			window.dashboardLoadingManager.setLoading(id, false);
+		}
+		
+		// استفاده از سیستم بروزرسانی هوشمند - فقط در صورت تغییر واقعی
+		if (window.smartSafeUpdate) {
+			return window.smartSafeUpdate(id, value);
+		} else {
+			// Fallback برای حالت عادی
+			const el = document.getElementById(id);
+			if (el && value !== undefined && value !== null && value !== 'Error' && value !== 'در دسترس نیست') {
+				if (el.innerText !== value) {
+					el.innerText = value;
+				}
+			}
+		}
 	};
 
 	// Update blockchain information cards
 	
 
-	// Show loading state
-	const loadingElements = ['circulating-supply', 'total-points', 'contract-token-balance', 'dashboard-cashback-value', 'dashboard-dai-balance', 'dashboard-wallets-count', 'dashboard-registration-price'];
-	loadingElements.forEach(id => {
-	  const el = document.getElementById(id);
-	  if (el) el.innerText = 'Loading...';
-	});
+	// حذف loading state در بروزرسانی‌ها - فقط مقادیر قبلی را نگه دار
+	// عدم نمایش "در حال بارگذاری..." در بروزرسانی‌های عادی
 
 	// TOTAL SUPPLY (circulating supply)
 	try {
@@ -4136,8 +4149,8 @@ window.updateDashboardStats = async function() {
 	  
 	  const totalSupply = await Promise.race([totalSupplyPromise, timeoutPromise]);
 	  const formattedSupply = parseFloat(ethers.formatUnits(totalSupply, 18)).toLocaleString('en-US', {maximumFractionDigits: 2});
-	  safeUpdate('circulating-supply', formattedSupply + ' CPA');
-	  console.log('✅ Total supply updated:', formattedSupply + ' CPA');
+	  safeUpdate('circulating-supply', formattedSupply); // حذف پسوند CPA
+	  console.log('✅ Total supply updated:', formattedSupply);
 
 	} catch (e) {
 	  console.error('❌ Error fetching total supply:', e);
@@ -4168,8 +4181,8 @@ window.updateDashboardStats = async function() {
 	  console.log('🏦 Fetching contract token balance...');
 	  const contractTokenBalance = await contract.balanceOf(contract.target);
 	  const formattedBalance = parseFloat(ethers.formatUnits(contractTokenBalance, 18)).toLocaleString('en-US', {maximumFractionDigits: 2});
-	  safeUpdate('contract-token-balance', formattedBalance + ' CPA');
-	  console.log('✅ Contract token balance updated:', formattedBalance + ' CPA');
+	  safeUpdate('contract-token-balance', formattedBalance); // حذف پسوند CPA
+	  console.log('✅ Contract token balance updated:', formattedBalance);
 
 	} catch (e) {
 	  console.error('❌ Error fetching contract token balance:', e);
@@ -4192,17 +4205,17 @@ window.updateDashboardStats = async function() {
 	  }
 	  
 	  const formattedCashback = parseFloat(ethers.formatUnits(cashback, 18)).toLocaleString('en-US', {maximumFractionDigits: 2});
-	  safeUpdate('dashboard-cashback-value', formattedCashback + ' CPA');
-	  console.log('✅ Cashback updated:', formattedCashback + ' CPA');
+	  safeUpdate('dashboard-cashback-value', formattedCashback); // حذف پسوند CPA
+	  console.log('✅ Cashback updated:', formattedCashback);
 
 	} catch (e) {
 	  console.error('❌ Error fetching cashback:', e);
 	  safeUpdate('dashboard-cashback-value', 'N/A');
 	}
 
-	// DAI CONTRACT BALANCE - Using contract's getContractdaiBalance function
+	// USDC CONTRACT BALANCE - Using contract's getContractdaiBalance function
 	try {
-	  console.log('💵 Fetching DAI contract balance...');
+	  console.log('💵 Fetching USDC contract balance...');
 	  let daiBalance;
 	  
 	  // Try different possible function names (corrected function name)
@@ -4211,19 +4224,19 @@ window.updateDashboardStats = async function() {
 	  } else if (typeof contract.getContractDAIBalance === 'function') {
 		daiBalance = await contract.getContractDAIBalance();
 	  } else {
-		// Fallback to direct DAI contract call
-		if (typeof DAI_ADDRESS !== 'undefined' && typeof DAI_ABI !== 'undefined') {
-		  const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, contract.provider);
+		// Fallback to direct DAI contract call (for testing)
+		if (typeof DAI_ADDRESS_FOR_TEST !== 'undefined' && typeof DAI_ABI !== 'undefined') {
+		  const daiContract = new ethers.Contract(DAI_ADDRESS_FOR_TEST, DAI_ABI, contract.provider);
 		  daiBalance = await daiContract.balanceOf(contract.target);
 		} else {
 		  daiBalance = 0n;
 		}
 	  }
 	  
-	  // Fixed: DAI has 18 decimals, not 6
-	  const formattedDai = parseFloat(ethers.formatUnits(daiBalance, 18)).toLocaleString('en-US', {maximumFractionDigits: 2});
-	  safeUpdate('dashboard-dai-balance', formattedDai + ' DAI');
-	  console.log('✅ DAI contract balance updated:', formattedDai + ' DAI');
+	  // DAI has 18 decimals (but display as USDC)
+	  const formattedUsdc = parseFloat(ethers.formatUnits(daiBalance, 18)).toLocaleString('en-US', {maximumFractionDigits: 2});
+	  safeUpdate('dashboard-dai-balance', formattedUsdc); // حذف پسوند DAI
+	  console.log('✅ DAI contract balance updated:', formattedUsdc);
 
 	} catch (e) {
 	  console.error('❌ Error fetching DAI balance:', e);
@@ -4245,8 +4258,8 @@ window.updateDashboardStats = async function() {
 	  const pointValue = await contract.getPointValue();
 	  const pointValueNum = parseFloat(ethers.formatUnits(pointValue, 18));
 	  const formattedPointValue = pointValueNum.toLocaleString('en-US', {maximumFractionDigits: 6});
-	  safeUpdate('dashboard-point-value', formattedPointValue + ' CPA');
-	  console.log('✅ Point value updated:', formattedPointValue + ' CPA');
+	  safeUpdate('dashboard-point-value', formattedPointValue); // حذف پسوند CPA
+	  console.log('✅ Point value updated:', formattedPointValue);
 	  
 	  // Save point price to history
 	  if (window.priceHistoryManager) {
@@ -4269,8 +4282,8 @@ window.updateDashboardStats = async function() {
 	  } else {
 		formattedTokenPrice = tokenPriceNum.toLocaleString('en-US', {maximumFractionDigits: 6});
 	  }
-	  safeUpdate('dashboard-token-price', formattedTokenPrice + ' DAI');
-	  console.log('✅ Token price updated:', formattedTokenPrice + ' DAI');
+	  safeUpdate('dashboard-token-price', formattedTokenPrice); // حذف پسوند DAI
+	  console.log('✅ Token price updated:', formattedTokenPrice);
 	  
 	  // Save token price to history
 	  if (window.priceHistoryManager) {
@@ -4298,8 +4311,8 @@ window.updateDashboardStats = async function() {
 	  console.log('🎫 Fetching registration price...');
 	  const registrationPrice = await window.getRegPrice(contract);
 	  const formattedRegPrice = parseFloat(ethers.formatUnits(registrationPrice, 18)).toLocaleString('en-US', {maximumFractionDigits: 0});
-	  safeUpdate('dashboard-registration-price', formattedRegPrice + ' CPA');
-	  console.log('✅ Registration price updated:', formattedRegPrice + ' CPA');
+	  safeUpdate('dashboard-registration-price', formattedRegPrice); // حذف پسوند CPA
+	  console.log('✅ Registration price updated:', formattedRegPrice);
 	} catch (e) {
 	  console.error('❌ Error fetching registration price:', e);
 	  safeUpdate('dashboard-registration-price', 'Error');
@@ -4332,32 +4345,25 @@ window.updateDashboardStats = async function() {
 // اجرا در ابتدای بارگذاری صفحه
 document.addEventListener('DOMContentLoaded', function() {
   // Initial update after 2 seconds
-  setTimeout(async () => {
-	try {
-	  const connection = await window.connectWallet();
-	  await updateDashboardStats();
-	} catch (error) {
-	  console.error('❌ Error in initial setup:', error);
-	  // Show error in UI
-	  const elements = ['circulating-supply', 'total-points', 'contract-token-balance', 'dashboard-cashback-value', 'dashboard-dai-balance', 'dashboard-wallets-count', 'dashboard-registration-price'];
-	  elements.forEach(id => {
-		const el = document.getElementById(id);
-		if (el) el.innerText = 'Connection Error';
-	  });
-	}
-  }, 2000);
+  // setTimeout غیرفعال شد - هیچ بروزرسانی خودکار نیست
+  // setTimeout(async () => {
+	// try {
+	//   const connection = await window.connectWallet();
+	//   await updateDashboardStats();
+	// } catch (error) {
+	//   console.error('❌ Error in initial setup:', error);
+	//   // Show error in UI
+	//   const elements = ['circulating-supply', 'total-points', 'contract-token-balance', 'dashboard-cashback-value', 'dashboard-dai-balance', 'dashboard-wallets-count', 'dashboard-registration-price'];
+	//   elements.forEach(id => {
+	// 	const el = document.getElementById(id);
+	// 	if (el) el.innerText = 'Connection Error';
+	//   });
+	// }
+  // }, 2000);
   
-  // Set up interval for blockchain info updates (every 5 seconds)
-  if (!window._blockchainInfoIntervalSet) {
-	setInterval(async () => {
-	  try {
-		await updateDashboardStats();
-	  } catch (error) {
-		console.error('❌ Error in scheduled update:', error);
-	  }
-	}, 5000); // 5 seconds
-	window._blockchainInfoIntervalSet = true;
-  }
+  // سیستم مرکزی جایگزین شده - این interval غیرفعال شد
+  window._blockchainInfoIntervalSet = true; // جلوگیری از ایجاد interval جدید
+  console.log('✅ سیستم مرکزی مدیریت blockchain info را انجام می‌دهد');
 });
 
 
@@ -4389,7 +4395,7 @@ async function updatePriceChart() {
 }
 
 // Returns the DAI balance of the main contract (CPA_ADDRESS) as a string in DAI units (18 decimals)
-async function getContractDAIBalance() {
+async function getContractUSDCBalance() {
   if (typeof ethers === 'undefined') throw new Error('ethers.js not loaded');
   const provider = (window.contractConfig && window.contractConfig.contract && window.contractConfig.contract.provider)
 	? window.contractConfig.contract.provider
@@ -4397,9 +4403,14 @@ async function getContractDAIBalance() {
 	  ? window.contractConfig.provider
 	  : (window.ethereum ? new ethers.BrowserProvider(window.ethereum) : null);
   if (!provider) throw new Error('No provider');
-  const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, provider);
+  const daiContract = new ethers.Contract(DAI_ADDRESS_FOR_TEST, DAI_ABI, provider);
   const balanceRaw = await daiContract.balanceOf(CPA_ADDRESS);
-  return ethers.formatUnits(balanceRaw, 18); // Fixed: DAI has 18 decimals, not 6
+  return ethers.formatUnits(balanceRaw, 18); // DAI has 18 decimals (but display as USDC)
+}
+
+// Backward compatibility
+async function getContractDAIBalance() {
+  return await getContractUSDCBalance();
 }
 
 // ... existing code ...
@@ -4464,8 +4475,8 @@ async function updateContractStats() {
 	const contract = new ethers.Contract(CPA_ADDRESS, CPA_ABI, provider);
 	// Total Points (integer, no decimals)
 	window.contractStats.totalPoints = (await contract.totalClaimablePoints()).toString();
-	// DAI Balance (calls helper)
-	window.contractStats.daiBalance = await getContractDAIBalance();
+	// USDC Balance (calls helper)
+	window.contractStats.daiBalance = await getContractUSDCBalance();
 	// Token Balance (calls helper)
 	window.contractStats.tokenBalance = await getContractTokenBalance();
 	// Wallets count
@@ -4515,7 +4526,7 @@ async function updateTokenPriceDisplay() {
 	  const pointValueNum = parseFloat(ethers.formatUnits(pointValue, 18));
 	  const pointValueFormatted = pointValueNum < 0.000001 ? pointValueNum.toExponential(6) : pointValueNum.toFixed(2);
 	  const el2 = document.getElementById('point-value');
-	  if (el2) el2.textContent = pointValueFormatted + ' CPA';
+	  if (el2) el2.textContent = pointValueFormatted; // حذف پسوند CPA
 	} catch (error) {
 	  // ...
 	}
@@ -4526,13 +4537,13 @@ async function updateTokenPriceDisplay() {
 }
 
 
-// Set up interval for token price updates
-if (!window._dashboardIntervalSet) {
-  setInterval(() => {
-	updateTokenPriceDisplay();
-  }, 30000);
-  window._dashboardIntervalSet = true;
-}
+// Set up interval for token price updates - غیرفعال شد
+// if (!window._dashboardIntervalSet) {
+//   setInterval(() => {
+// 	updateTokenPriceDisplay();
+//   }, 30000);
+//   window._dashboardIntervalSet = true;
+// }
 
 
 
@@ -5003,7 +5014,7 @@ window.tokenAddress = CPA_ADDRESS;
 window.tokenAbi = CPA_ABI;
 
 // ... existing code ...
-window.DAI_ADDRESS = DAI_ADDRESS;
+window.DAI_ADDRESS = DAI_ADDRESS_FOR_TEST;
 window.DAI_ABI = DAI_ABI;
 window.CPA_ADDRESS = CPA_ADDRESS;
 window.CONTRACT_ABI = CPA_ABI;

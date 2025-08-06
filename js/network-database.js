@@ -11,19 +11,8 @@ class NetworkTreeDatabase {
     async init() {
         try {
             console.log('🌳 راه‌اندازی دیتابیس درخت شبکه...');
-                        await window.safeQueryEvents(
-              window.contractConfig.contract,
-              window.contractConfig.contract.filters.Activated(),
-              0,
-              await ((window.contractConfig.contract.runner && window.contractConfig.contract.runner.provider) || window.contractConfig.contract.provider).getBlockNumber()
-            )            const provider = window.ethereum;
-            const contract = window.contractConfig.contract.connect(provider);
-            await window.safeQueryEvents(contract, contract.filters.Activated(), 0, await provider.getBlockNumber())            const ethersProvider = new ethers.BrowserProvider(window.ethereum);
-            const contract = window.contractConfig.contract.connect(ethersProvider);
-            const blockNumber = await ethersProvider.getBlockNumber();
-            await window.safeQueryEvents(contract, contract.filters.Activated(), 0, blockNumber);            const provider = window.contractConfig.contract.provider || (window.contractConfig.contract.runner && window.contractConfig.contract.runner.provider);
-            const blockNumber = await provider.getBlockNumber();
-            await window.safeQueryEvents(window.contractConfig.contract, window.contractConfig.contract.filters.Activated(), 0, blockNumber);// بررسی اینکه Firebase در دسترس است
+            
+            // بررسی اینکه Firebase در دسترس است
             if (typeof window.firebasePriceHistory !== 'undefined') {
                 this.isInitialized = true;
                 console.log('✅ دیتابیس درخت شبکه آماده است');

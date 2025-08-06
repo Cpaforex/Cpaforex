@@ -253,15 +253,14 @@ class MobileUserPopup {
 
                 // دریافت موجودی DAI
                 try {
-                    const DAI_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'; // آدرس DAI در Polygon
+                    // استفاده از DAI برای تست ولی نمایش USDC
                     const DAI_ABI = [
                         "function balanceOf(address) view returns (uint256)",
                         "function decimals() view returns (uint8)"
                     ];
-                    const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, provider);
+                    const daiContract = new ethers.Contract(window.DAI_ADDRESS, DAI_ABI, provider);
                     const daiRaw = await daiContract.balanceOf(address);
-                    const decimals = await daiContract.decimals();
-                    const dai = Number(ethers.utils.formatUnits(daiRaw, decimals)).toFixed(2);
+                    const dai = (Number(daiRaw) / 1e18).toFixed(2); // DAI has 18 decimals
                     document.getElementById('dai-balance').textContent = dai;
                 } catch(e) {
                     document.getElementById('dai-balance').textContent = '❌';

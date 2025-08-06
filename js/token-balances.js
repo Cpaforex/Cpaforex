@@ -80,15 +80,13 @@ window.TokenBalances = {
                 if (cpaBalance) balances.cpa = Number(cpaBalance).toFixed(2);
             }
 
-            // DAI Balance
-            const DAI_ADDRESS = '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063';
-            const DAI_ABI = ["function balanceOf(address) view returns (uint256)"];
-            const daiBalance = await this.getTokenBalance(
-                address,
-                DAI_ADDRESS,
-                DAI_ABI,
-                18
-            );
+                    // DAI Balance (display as USDC)
+        const daiBalance = await this.getTokenBalance(
+            address,
+            window.DAI_ADDRESS,
+            window.DAI_ABI,
+            18 // DAI has 18 decimals
+        );
             if (daiBalance) balances.dai = Number(daiBalance).toFixed(2);
 
             // MATIC Balance

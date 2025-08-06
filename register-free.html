@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ثبت‌نام کاربر جدید</title>
+  <title>ثبت‌نام رزرو</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
     body {
@@ -57,13 +57,13 @@
   <script src="js/navbar.js"></script>
   <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ios-background);">
     <form class="register-form" autocomplete="off" style="max-width:430px;width:100%;margin:0 auto;">
-      <h2 class="register-form-title" style="text-align:center;margin-bottom:18px;">فرم ثبت‌نام کاربر جدید</h2>
+      <h2 class="register-form-title" style="text-align:center;margin-bottom:18px;">فرم ثبت‌نام رزرو</h2>
       <div class="register-form-status info" id="connection-status"></div>
       <div class="register-form-status warning" id="register-suggestion" style="display:none;"></div>
       <div class="form-group">
         <label for="index-search">ایندکس (Index)</label>
                  <div style="font-size:0.85rem;color:#a786ff;margin-bottom:8px;background:rgba(167,134,255,0.1);padding:8px;border-radius:6px;border:1px solid rgba(167,134,255,0.3);">
-           ⚠️ <strong>محدودیت:</strong> فقط می‌توانید برای ایندکس‌های موجود در خط رفرال خود ثبت‌نام کنید.
+           ⚠️ <strong>محدودیت:</strong> فقط می‌توانید برای ایندکس‌های موجود در خط رفرال خود ثبت‌نام رزرو کنید.
          </div>
         <input type="text" id="index-search" class="register-form-input" placeholder="مثلاً 123" autocomplete="off" value="refferer ID : CPA00000" style="width:100%;min-width:0;">
       </div>
@@ -77,7 +77,7 @@
       <div class="form-group">
         <label for="new-user-address">آدرس کاربر جدید</label>
         <div style="font-size:0.8rem;color:#718096;margin-bottom:6px;background:rgba(113,128,150,0.1);padding:6px;border-radius:4px;">
-          👤 آدرس کیف پول کاربری که می‌خواهید ثبت‌نام کنید. این آدرس نباید قبلاً ثبت‌نام شده باشد.
+          👤 آدرس کیف پول کاربری که می‌خواهید ثبت‌نام رزرو کنید. این آدرس نباید قبلاً ثبت‌نام شده باشد.
         </div>
         <input type="text" id="new-user-address" class="register-form-input" placeholder="0x..." autocomplete="off">
       </div>
@@ -108,11 +108,11 @@
       </script>
       <div class="info-box" id="register-info" style="background:rgba(28,28,40,0.97);color:#fff;font-weight:bold;font-size:1.08rem;box-shadow:0 2px 8px #a786ff22;margin-bottom:18px;">
         <div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(167,134,255,0.3);">
-          <div style="color:#a786ff;font-size:0.9rem;margin-bottom:4px;">📊 اطلاعات ثبت‌نام:</div>
+          <div style="color:#a786ff;font-size:0.9rem;margin-bottom:4px;">📊 اطلاعات ثبت‌نام رزرو:</div>
         </div>
         <div style="margin-bottom:8px;">🎯 ایندکس رفرر: <b id="parent-index">...</b></div>
         <div style="margin-bottom:8px;">📍 ایندکس جایگاه جدید: <b id="empty-index">...</b></div>
-        <div style="margin-bottom:8px;">💰 هزینه ثبت‌نام:<br><b id="register-cost" style="display:inline-block;margin-top:4px;font-size:1.1rem;color:#00ff88;">...</b></div>
+        <div style="margin-bottom:8px;">💰 هزینه ثبت‌نام رزرو:<br><b id="register-cost" style="display:inline-block;margin-top:4px;font-size:1.1rem;color:#00ff88;">...</b></div>
         
         <div style="margin-top:12px;padding-top:8px;border-top:1px solid rgba(167,134,255,0.3);">
           <div style="color:#a786ff;font-size:0.9rem;margin-bottom:8px;">💳 موجودی کیف پول:</div>
@@ -127,7 +127,7 @@
           </span>
           </div>
           <div style="font-size:0.8rem;color:#718096;margin-top:8px;text-align:center;background:rgba(113,128,150,0.1);padding:6px;border-radius:4px;">
-            💡 برای ثبت‌نام نیاز به موجودی کافی CPA یا MATIC دارید
+            💡 برای ثبت‌نام رزرو نیاز به معادل $23 توکن CPA دارید
           </div>
         </div>
       </div>
@@ -137,13 +137,13 @@
         <span class="avatar-choice" data-avatar="student-man">👨‍🎓</span>
         <span class="avatar-choice" data-avatar="student-woman">👩‍🎓</span>
       </div>
-      <button class="register-btn buy-btn" id="register-btn" type="button" style="width:100%;margin-top:18px;">ثبت‌نام</button>
-      <div class="register-form-status" id="status-message"></div>
-      
-      <div style="margin-top:20px;padding:12px;background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.3);border-radius:8px;text-align:center;font-size:0.9rem;color:#ffc107;">
-          ⚠️ برای ثبت‌نام نیاز به موجودی کافی CPA و MATIC دارید
-      </div>
-    </form>
+                             <button class="register-btn buy-btn" id="register-btn" type="button" style="width:100%;margin-top:18px;">ثبت‌نام رزرو</button>
+                       <div class="register-form-status" id="status-message"></div>
+                       
+                       <div style="margin-top:20px;padding:12px;background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.3);border-radius:8px;text-align:center;font-size:0.9rem;color:#ffc107;">
+                           ⚠️ برای ثبت‌نام نیاز به موجودی کافی CPA و MATIC دارید
+                       </div>
+                   </form>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
   <script src="js/config.js"></script>
@@ -229,11 +229,11 @@
           if (user && !user.activated) {
             console.log(`⚠️ کاربر ثبت‌نام شده اما فعال نیست`);
             suggestionDiv.style.display = '';
-            suggestionDiv.textContent = 'شما هنوز ثبت‌نام نکرده‌اید. لطفاً ثبت‌نام کنید.';
+            suggestionDiv.textContent = 'شما هنوز ثبت‌نام نکرده‌اید. لطفاً ثبت‌نام رزرو کنید.';
           } else if (!user) {
             console.log(`⚠️ کاربر اصلاً ثبت‌نام نشده است`);
             suggestionDiv.style.display = '';
-            suggestionDiv.textContent = 'شما هنوز ثبت‌نام نکرده‌اید. لطفاً ثبت‌نام کنید.';
+            suggestionDiv.textContent = 'شما هنوز ثبت‌نام نکرده‌اید. لطفاً ثبت‌نام رزرو کنید.';
           } else {
             console.log(`✅ کاربر فعال است: ایندکس=${user.index}`);
             suggestionDiv.style.display = 'none';
@@ -279,16 +279,24 @@
           }
         }
         document.getElementById('empty-index').textContent = emptyIndex;
-        // هزینه ثبت‌نام
-        let regCost = '...';
-        if (window.getRegPrice) {
-          let cost = await window.getRegPrice(contract);
-          if (cost) {
-            let costValue = typeof ethers !== 'undefined' ? ethers.formatEther(cost) : (Number(cost)/1e18);
-            regCost = Math.round(parseFloat(costValue)).toString(); // حذف اعشار و گرد کردن
+        
+        // هزینه ثبت‌نام رزرو (معادل $23)
+        let regCost = 'معادل $23';
+        try {
+          // دریافت قیمت توکن برای محاسبه دقیق
+          if (typeof contract.getTokenPrice === 'function') {
+            const tokenPrice = await contract.getTokenPrice();
+            // getTokenPrice خروجی با 18 decimal داره، باید formatUnits استفاده کنیم
+            const tokenPriceNum = Number(ethers.formatUnits(tokenPrice, 18));
+            const requiredAmount = (23 / tokenPriceNum);
+            regCost = `${requiredAmount.toFixed(2)} CPA`;
           }
+        } catch (e) {
+          console.log('خطا در دریافت قیمت توکن:', e);
+          regCost = '23 CPA'; // مقدار پیش‌فرض اگر getTokenPrice کار نکرد
         }
-        document.getElementById('register-cost').textContent = regCost + ' CPA';
+        document.getElementById('register-cost').textContent = regCost;
+        
         // موجودی متیک
         let maticBalance = '...';
         if (isConnected && contract && myAddress) {
@@ -307,27 +315,31 @@
             let cpa = await contract.balanceOf(myAddress);
             cpaBalance = cpa ? (typeof ethers !== 'undefined' ? Number(ethers.formatEther(cpa)).toFixed(2) : (Number(cpa)/1e18).toFixed(2)) : '0.00';
             
-            // بررسی کفایت موجودی CPA برای ثبت‌نام
+            // بررسی کفایت موجودی CPA برای ثبت‌نام رزرو
             const cpaBalanceElement = document.getElementById('cpa-balance');
-            const registerCostElement = document.getElementById('register-cost');
             try {
-              // دریافت هزینه ثبت‌نام
-              let requiredCPA = 0;
-              if (window.getRegPrice && contract) {
-                let cost = await window.getRegPrice(contract);
-                if (cost) {
-                  let costValue = typeof ethers !== 'undefined' ? ethers.formatEther(cost) : (Number(cost)/1e18);
-                  requiredCPA = Math.round(parseFloat(costValue));
-                }
+              let tokenPriceNum = 1; // قیمت پیش‌فرض 1 دلار
+              if (typeof contract.getTokenPrice === 'function') {
+                const tokenPrice = await contract.getTokenPrice();
+                tokenPriceNum = Number(ethers.formatUnits(tokenPrice, 18));
+              }
+              const requiredCPA = (23 / tokenPriceNum).toFixed(2);
+              
+              // رنگ موجودی CPA
+              if (parseFloat(cpaBalance) >= parseFloat(requiredCPA)) {
+                cpaBalanceElement.style.color = '#00ff88'; // سبز: کافی است
+              } else {
+                cpaBalanceElement.style.color = '#ff453a'; // قرمز: کافی نیست
               }
               
-              // رنگ موجودی و هزینه بر اساس کفایت موجودی
-              if (parseFloat(cpaBalance) >= requiredCPA) {
-                cpaBalanceElement.style.color = '#00ff88'; // سبز: کافی است
-                if (registerCostElement) registerCostElement.style.color = '#00ff88';
-              } else {
-                cpaBalanceElement.style.color = '#ff453a'; // قرمز: کافی نیست  
-                if (registerCostElement) registerCostElement.style.color = '#ff453a';
+              // رنگ هزینه ثبت‌نام بر اساس کفایت موجودی
+              const registerCostElement = document.getElementById('register-cost');
+              if (registerCostElement) {
+                if (parseFloat(cpaBalance) >= parseFloat(requiredCPA)) {
+                  registerCostElement.style.color = '#00ff88'; // سبز: موجودی کافی است
+                } else {
+                  registerCostElement.style.color = '#ff453a'; // قرمز: موجودی کافی نیست
+                }
               }
             } catch (e) {
               console.log('خطا در بررسی کفایت موجودی:', e);
@@ -452,7 +464,7 @@
             
             if (!isIndexInUserSubtree(targetIndex, currentUserIndex)) {
               status.style.color = '#d32f2f';
-              status.textContent = `شما مجاز به ثبت‌نام برای این ایندکس نیستید. فقط ایندکس‌های زیرمجموعه شما مجاز هستند.`;
+              status.textContent = `شما مجاز به ثبت‌نام رزرو برای این ایندکس نیستید. فقط ایندکس‌های زیرمجموعه شما مجاز هستند.`;
               return;
             } else {
               status.style.color = '#388e3c';
@@ -462,7 +474,7 @@
           } else {
             console.log(`⚠️ کاربر فعال نیست یا ایندکس ندارد:`, currentUser);
             status.style.color = '#d32f2f';
-            status.textContent = `شما باید ابتدا ثبت‌نام کنید تا بتوانید برای دیگران ثبت‌نام انجام دهید.`;
+            status.textContent = `شما باید ابتدا ثبت‌نام کنید تا بتوانید برای دیگران ثبت‌نام رزرو انجام دهید.`;
             return;
           }
           
@@ -557,7 +569,7 @@
             
             if (!isIndexInUserSubtree(targetIndex, currentUserIndex)) {
               status.style.color = '#d32f2f';
-              status.textContent = `شما مجاز به ثبت‌نام برای این آدرس نیستید. فقط ایندکس‌های زیرمجموعه شما مجاز هستند.`;
+              status.textContent = `شما مجاز به ثبت‌نام رزرو برای این آدرس نیستید. فقط ایندکس‌های زیرمجموعه شما مجاز هستند.`;
               return;
             } else {
               status.style.color = '#388e3c';
@@ -566,7 +578,7 @@
           } else {
             console.log(`⚠️ کاربر فعال نیست یا ایندکس ندارد:`, currentUser);
             status.style.color = '#d32f2f';
-            status.textContent = `شما باید ابتدا ثبت‌نام کنید تا بتوانید برای دیگران ثبت‌نام انجام دهید.`;
+            status.textContent = `شما باید ابتدا ثبت‌نام کنید تا بتوانید برای دیگران ثبت‌نام رزرو انجام دهید.`;
             return;
           }
           
@@ -627,7 +639,7 @@
           
           // اگر ثبت‌نام نشده، پیام موفقیت
           status.style.color = '#388e3c';
-          status.textContent = 'آدرس کاربر جدید معتبر است و می‌تواند ثبت‌نام شود.';
+          status.textContent = 'آدرس کاربر جدید معتبر است و می‌تواند ثبت‌نام رزرو شود.';
           
           // نمایش ایندکس مربوط به این آدرس (اگر وجود داشته باشد)
           try {
@@ -660,7 +672,7 @@
       
 
 
-    // ثبت‌نام کاربر جدید
+    // ثبت‌نام رزرو کاربر جدید
     document.getElementById('register-btn').onclick = async function() {
       const status = document.getElementById('status-message');
       if (!isConnected) {
@@ -700,35 +712,58 @@
              }
            }
          } catch (e) {
-           console.log(`خطا در دریافت اطلاعات کاربر در ثبت‌نام:`, e);
+           console.log(`خطا در دریافت اطلاعات کاربر در ثبت‌نام رزرو:`, e);
          }
          
-         console.log(`🔍 بررسی کاربر در ثبت‌نام:`, user);
+         console.log(`🔍 بررسی کاربر در ثبت‌نام رزرو:`, user);
                  // بررسی اینکه آیا ایندکس هدف در خط رفرال کاربر جاری قرار دارد
          if (user && user.activated && user.index && enteredIndex !== null) {
            const currentUserIndex = parseInt(user.index);
            const targetIndex = parseInt(enteredIndex);
-           console.log(`🔍 بررسی در ثبت‌نام: کاربر جاری=${currentUserIndex}, هدف=${targetIndex}`);
+           console.log(`🔍 بررسی در ثبت‌نام رزرو: کاربر جاری=${currentUserIndex}, هدف=${targetIndex}`);
            
            if (!isIndexInUserSubtree(targetIndex, currentUserIndex)) {
-             throw new Error(`شما فقط مجاز به ثبت‌نام برای ایندکس‌های زیرمجموعه خود هستید.`);
+             throw new Error(`شما فقط مجاز به ثبت‌نام رزرو برای ایندکس‌های زیرمجموعه خود هستید.`);
            }
          } else {
-           console.log(`⚠️ کاربر فعال نیست یا ایندکس ندارد در ثبت‌نام:`, user);
-           throw new Error(`شما باید ابتدا ثبت‌نام کنید تا بتوانید برای دیگران ثبت‌نام انجام دهید.`);
+           console.log(`⚠️ کاربر فعال نیست یا ایندکس ندارد در ثبت‌نام رزرو:`, user);
+           throw new Error(`شما باید ابتدا ثبت‌نام کنید تا بتوانید برای دیگران ثبت‌نام رزرو انجام دهید.`);
         }
         const addrFromIndex = await contract.indexToAddress(enteredIndex);
         if (addrFromIndex.toLowerCase() !== referrer.toLowerCase()) {
           throw new Error('ایندکس وارد شده با آدرس معرف مطابقت ندارد. لطفاً بررسی کنید.');
         }
-        status.textContent = 'در حال ارسال درخواست ثبت‌نام به شبکه... لطفاً منتظر تأیید تراکنش باشید.';
+        
+        // بررسی موجودی توکن برای ثبت‌نام رزرو
+        const userBalance = await contract.balanceOf(myAddress);
+        let tokenPriceNum = 1; // قیمت پیش‌فرض 1 دلار
+        try {
+          if (typeof contract.getTokenPrice === 'function') {
+            const tokenPrice = await contract.getTokenPrice();
+            tokenPriceNum = Number(ethers.formatUnits(tokenPrice, 18));
+          }
+        } catch (e) {
+          console.log('خطا در دریافت قیمت توکن، از قیمت پیش‌فرض استفاده می‌شود:', e);
+        }
+        
+        // محاسبه مقدار مورد نیاز (23 دلار / قیمت هر توکن)
+        const requiredAmountFloat = 23 / tokenPriceNum;
+        const requiredAmount = ethers.parseEther(requiredAmountFloat.toString());
+        
+        if (userBalance < requiredAmount) {
+          const requiredFormatted = requiredAmountFloat.toFixed(2);
+          const currentFormatted = Number(ethers.formatEther(userBalance)).toFixed(2);
+          throw new Error(`موجودی CPA شما کافی نیست. مورد نیاز: ${requiredFormatted} CPA، موجودی فعلی: ${currentFormatted} CPA`);
+        }
+        
+        status.textContent = 'در حال ارسال درخواست ثبت‌نام رزرو به شبکه... لطفاً منتظر تأیید تراکنش باشید.';
         status.style.color = '#1976d2';
         localStorage.setItem('avatar_' + newUser, selectedAvatar);
-        const tx = await contract.registerAndActivate(referrer, newUser);
+        const tx = await contract.registerFree(referrer, newUser);
         status.textContent = 'در حال انتظار برای تأیید تراکنش توسط شبکه...';
         await tx.wait();
         status.style.color = '#388e3c';
-        status.textContent = 'ثبت‌نام با موفقیت انجام شد! به خانواده CPA خوش آمدید.';
+        status.textContent = 'ثبت‌نام رزرو با موفقیت انجام شد! به خانواده CPA خوش آمدید.';
         setTimeout(loadRegisterInfo, 1500);
       } catch (e) {
         status.style.color = '#d32f2f';
@@ -741,9 +776,14 @@
         } else if (/invalid referrer|referrer/i.test(errorMsg)) {
           status.textContent = 'آدرس معرف معتبر نیست یا وجود ندارد.';
         } else if (/insufficient|balance|موجودی/i.test(errorMsg)) {
-          status.textContent = 'موجودی کیف پول شما برای ثبت‌نام کافی نیست.';
+          // اگر خطای کمبود موجودی از smart contract آمده، همان پیام رو نشون بده
+          if (errorMsg.includes('CPA شما کافی نیست')) {
+            status.textContent = errorMsg;
+          } else {
+            status.textContent = 'موجودی CPA شما برای ثبت‌نام رزرو کافی نیست.';
+          }
         } else if (/user rejected|reject|لغو شد/i.test(errorMsg)) {
-          status.textContent = 'فرآیند ثبت‌نام توسط شما لغو شد.';
+          status.textContent = 'فرآیند ثبت‌نام رزرو توسط شما لغو شد.';
         } else if (/execution reverted/i.test(errorMsg)) {
           const match = errorMsg.match(/reverted: "([^"]+)"/);
           if (match && match[1]) {
@@ -752,7 +792,7 @@
             status.textContent = 'تراکنش توسط قرارداد لغو شد. لطفاً ورودی‌ها را بررسی کنید.';
           }
         } else {
-          status.textContent = '❌ خطا در ثبت‌نام: ' + (errorMsg.length > 120 ? errorMsg.slice(0,120)+'...' : errorMsg);
+          status.textContent = '❌ خطا در ثبت‌نام رزرو: ' + (errorMsg.length > 120 ? errorMsg.slice(0,120)+'...' : errorMsg);
         }
       }
       this.disabled = false;
@@ -778,4 +818,4 @@
     });
   </script>
 </body>
-</html> 
+</html>

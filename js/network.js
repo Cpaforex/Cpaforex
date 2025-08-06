@@ -23,6 +23,106 @@ function showUserPopup(address, user) {
     const walletAddress = address || '-';
     const isActive = user && user.activated ? true : false;
     
+    // تابع محاسبه تعداد ولت‌های سمت راست و چپ
+    async function calculateWalletCounts(userIndex, contract) {
+        try {
+            console.log(`🔍 محاسبه تعداد ولت‌ها برای ایندکس ${userIndex}...`);
+            
+            let leftCount = 0;
+            let rightCount = 0;
+            
+            // بررسی فرزندان مستقیم
+            const leftChildIndex = BigInt(userIndex) * 2n;
+            const rightChildIndex = BigInt(userIndex) * 2n + 1n;
+            
+            // بررسی فرزند چپ
+            try {
+                const leftAddress = await contract.indexToAddress(leftChildIndex);
+                if (leftAddress && leftAddress !== '0x0000000000000000000000000000000000000000') {
+                    const leftUser = await contract.users(leftAddress);
+                    if (leftUser && leftUser.activated) {
+                        leftCount = 1;
+                        // محاسبه بازگشتی برای فرزندان فرزند چپ
+                        leftCount += await calculateSubtreeCount(leftChildIndex, contract, 'left');
+                    }
+                }
+            } catch (e) {
+                console.log(`خطا در بررسی فرزند چپ:`, e);
+            }
+            
+            // بررسی فرزند راست
+            try {
+                const rightAddress = await contract.indexToAddress(rightChildIndex);
+                if (rightAddress && rightAddress !== '0x0000000000000000000000000000000000000000') {
+                    const rightUser = await contract.users(rightAddress);
+                    if (rightUser && rightUser.activated) {
+                        rightCount = 1;
+                        // محاسبه بازگشتی برای فرزندان فرزند راست
+                        rightCount += await calculateSubtreeCount(rightChildIndex, contract, 'right');
+                    }
+                }
+            } catch (e) {
+                console.log(`خطا در بررسی فرزند راست:`, e);
+            }
+            
+            console.log(`✅ تعداد ولت‌ها: چپ=${leftCount}, راست=${rightCount}`);
+            return { leftCount, rightCount };
+            
+        } catch (error) {
+            console.error(`خطا در محاسبه تعداد ولت‌ها:`, error);
+            return { leftCount: 0, rightCount: 0 };
+        }
+    }
+
+    // تابع محاسبه بازگشتی تعداد ولت‌ها در زیرمجموعه
+    async function calculateSubtreeCount(parentIndex, contract, side) {
+        let count = 0;
+        async function countRecursive(index) {
+            const leftChildIndex = BigInt(index) * 2n;
+            const rightChildIndex = BigInt(index) * 2n + 1n;
+            let subtreeCount = 0;
+            // بررسی فرزند چپ
+            try {
+                const leftAddress = await contract.indexToAddress(leftChildIndex);
+                if (leftAddress && leftAddress !== '0x0000000000000000000000000000000000000000') {
+                    const leftUser = await contract.users(leftAddress);
+                    if (leftUser && leftUser.activated) {
+                        subtreeCount += 1;
+                        subtreeCount += await countRecursive(leftChildIndex);
+                    }
+                }
+            } catch (e) {
+                // نادیده گرفتن خطاها
+            }
+            // بررسی فرزند راست
+            try {
+                const rightAddress = await contract.indexToAddress(rightChildIndex);
+                if (rightAddress && rightAddress !== '0x0000000000000000000000000000000000000000') {
+                    const rightUser = await contract.users(rightAddress);
+                    if (rightUser && rightUser.activated) {
+                        subtreeCount += 1;
+                        subtreeCount += await countRecursive(rightChildIndex);
+                    }
+                }
+            } catch (e) {
+                // نادیده گرفتن خطاها
+            }
+            return subtreeCount;
+        }
+        return await countRecursive(parentIndex);
+    }
+
+    // محاسبه تعداد ولت‌ها
+    let walletCounts = { leftCount: '⏳', rightCount: '⏳' };
+    if (window.contractConfig && window.contractConfig.contract && user.index) {
+        try {
+            walletCounts = await calculateWalletCounts(user.index, window.contractConfig.contract);
+        } catch (error) {
+            console.error('خطا در محاسبه تعداد ولت‌ها:', error);
+            walletCounts = { leftCount: 'خطا', rightCount: 'خطا' };
+        }
+    }
+
     // لیست struct
     const infoList = [
       {icon:'🎯', label:'امتیاز باینری', val:user.binaryPoints},
@@ -32,7 +132,9 @@ function showUserPopup(address, user) {
       {icon:'🤝', label:'درآمد رفرال', val:user.refclimed ? Math.floor(Number(user.refclimed) / 1e18) : 0},
       {icon:'💰', label:'سپرده کل', val:user.depositedAmount ? Math.floor(Number(user.depositedAmount) / 1e18) : 0},
       {icon:'⬅️', label:'امتیاز چپ', val:user.leftPoints},
-      {icon:'➡️', label:'امتیاز راست', val:user.rightPoints}
+      {icon:'➡️', label:'امتیاز راست', val:user.rightPoints},
+      {icon:'⬅️👥', label:'تعداد ولت چپ', val:walletCounts.leftCount},
+      {icon:'➡️👥', label:'تعداد ولت راست', val:walletCounts.rightCount}
     ];
 
     const popupEl = document.createElement('div');
@@ -203,7 +305,7 @@ function showUserPopup(address, user) {
                 if (typeof DAI_ADDRESS !== 'undefined' && typeof DAI_ABI !== 'undefined') {
                     const daiContract = new ethers.Contract(DAI_ADDRESS, DAI_ABI, provider);
                     let daiRaw = await daiContract.balanceOf(addr);
-                    dai = (typeof ethers !== 'undefined') ? Number(ethers.formatUnits(daiRaw, 6)).toFixed(2) : (Number(daiRaw)/1e18).toFixed(2);
+                    dai = (typeof ethers !== 'undefined') ? Number(ethers.formatUnits(daiRaw, 18)).toFixed(2) : (Number(daiRaw)/1e18).toFixed(2);
                 }
             } catch(e) {
                 console.warn('خطا در دریافت موجودی DAI:', e);
@@ -891,7 +993,7 @@ window.showUserStructTypewriter = function(address, user) {
     `پاداش رفرال:  ${user.refclimed ? Math.floor(Number(user.refclimed) / 1e18) : '0'}`,
     `موجودی CPA:  ${user.lvlBalance ? user.lvlBalance : '0'}`,
     `موجودی POL:  ${user.maticBalance ? user.maticBalance : '0'}`,
-    `موجودی DAI:  ${user.daiBalance ? user.daiBalance : '0'}`
+            `موجودی DAI:  ${user.daiBalance ? user.daiBalance : '0'}`
   ];
   const popup = document.createElement('div');
   popup.id = 'user-popup';

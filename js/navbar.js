@@ -264,6 +264,7 @@
         <a href="#" class="cpa-navbar-link" id="navbar-swap-link">🔄 تبدیل ارز</a>
         <a href="#" class="cpa-navbar-link" id="navbar-transfer-link">💸 ترانسفر</a>
         <a href="register.html" class="cpa-navbar-link">📝 ثبت‌نام</a>
+        <a href="register-free.html" class="cpa-navbar-link">🎯 رزرو</a>
         <a href="reports.html" class="cpa-navbar-link">📊 گزارش</a>
         <a href="profile.html" class="cpa-navbar-link"><span style="font-size:1.1em;vertical-align:middle;">👤</span> پروفایل</a>
         <a href="transfer-ownership.html" class="cpa-navbar-link">🔑 انتقال مالکیت</a>
@@ -286,6 +287,7 @@
         <a href="#" class="cpa-navbar-link" id="navbar-swap-link-mobile">🔄 تبدیل ارز</a>
         <a href="#" class="cpa-navbar-link" id="navbar-transfer-link-mobile">💸 ترانسفر</a>
         <a href="register.html" class="cpa-navbar-link">📝 ثبت‌نام</a>
+        <a href="register-free.html" class="cpa-navbar-link">🎯 رزرو</a>
         <a href="reports.html" class="cpa-navbar-link">📊 گزارش</a>
         <a href="profile.html" class="cpa-navbar-link"><span style="font-size:1.1em;vertical-align:middle;">👤</span> پروفایل</a>
         <a href="transfer-ownership.html" class="cpa-navbar-link">🔑 انتقال مالکیت</a>

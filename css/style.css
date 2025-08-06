@@ -8269,3 +8269,48 @@ body.signal-page { background: #181c2a; color: #fff; font-family: 'Noto Sans Ara
     grid-template-columns: 1fr;
   }
 }
+
+/* Quick Sell Button Styles */
+.quick-sell-btn {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.quick-sell-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.quick-sell-btn:active {
+  transform: scale(0.98);
+}
+
+/* Quick Sell Section Responsive */
+@media (max-width: 768px) {
+  #quick-sell-section {
+    margin: 1rem 0;
+  }
+  
+  #quick-sell-section > div {
+    padding: 1rem;
+  }
+  
+  #quick-sell-section .quick-sell-btn {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #quick-sell-section > div {
+    padding: 0.8rem;
+  }
+  
+  #quick-sell-section h3 {
+    font-size: 1rem;
+  }
+  
+  #quick-sell-section p {
+    font-size: 0.8rem;
+  }
+}
