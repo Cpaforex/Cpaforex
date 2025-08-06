@@ -129,10 +129,10 @@ class FloatingTokenGrowthCard {
     this.card.style.backgroundSize = '200% 200%';
     this.card.style.animation = 'gradientShift 2s ease infinite';
     
-    // اضافه کردن اطلاعات جزئی‌تر
+    // اضافه کردن اطلاعات جزئی‌تر با فرمت علمی
     this.statusElement.innerHTML = `
       <div style="margin-bottom: 8px;">قیمت فعلی: <span id="current-token-price">--</span></div>
-      <div>قیمت اولیه: <span id="initial-token-price">--</span></div>
+      <div>قیمت اولیه: <span id="initial-token-price">1e-15</span></div>
     `;
   }
   
@@ -263,8 +263,8 @@ class FloatingTokenGrowthCard {
     // به‌روزرسانی وضعیت
     if (this.isExpanded) {
       this.statusElement.innerHTML = `
-        <div style="margin-bottom: 8px;">قیمت فعلی: <span style="font-weight: bold;">${currentPrice.toFixed(4)}</span></div>
-        <div>قیمت اولیه: <span style="font-weight: bold;">${initialPrice.toFixed(4)}</span></div>
+        <div style="margin-bottom: 8px;">قیمت فعلی: <span style="font-weight: bold;">${currentPrice.toExponential(4)}</span></div>
+        <div>قیمت اولیه: <span style="font-weight: bold;">1e-15</span></div>
         <div style="margin-top: 5px; font-size: 0.6rem; opacity: 0.8;">منبع: ${source}</div>
       `;
     } else {
@@ -376,13 +376,55 @@ function addFloatingCardStyles() {
       #floating-token-growth-card {
         bottom: 10px;
         right: 10px;
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
+      }
+      
+      #floating-token-growth-card div:first-child {
+        font-size: 0.7rem !important;
+        margin-bottom: 2px !important;
+      }
+      
+      #token-growth-percentage {
+        font-size: 1rem !important;
+      }
+      
+      #token-growth-status {
+        font-size: 0.6rem !important;
+        margin-top: 1px !important;
       }
       
       #floating-token-growth-card.expanded {
-        width: 160px;
-        height: 160px;
+        width: 140px;
+        height: 140px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      #floating-token-growth-card {
+        bottom: 8px;
+        right: 8px;
+        width: 70px;
+        height: 70px;
+      }
+      
+      #floating-token-growth-card div:first-child {
+        font-size: 0.6rem !important;
+        margin-bottom: 1px !important;
+      }
+      
+      #token-growth-percentage {
+        font-size: 0.9rem !important;
+      }
+      
+      #token-growth-status {
+        font-size: 0.5rem !important;
+        margin-top: 1px !important;
+      }
+      
+      #floating-token-growth-card.expanded {
+        width: 120px;
+        height: 120px;
       }
     }
   `;
