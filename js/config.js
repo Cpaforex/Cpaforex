@@ -4601,12 +4601,8 @@ if (typeof window.showTab === 'function') {
 window.generateCPAId = function(index) {
 	if (!index || index === 0) return '0';
 	
-	// تبدیل به عدد
-	const numIndex = typeof index === 'bigint' ? Number(index) : parseInt(index);
-	if (isNaN(numIndex) || numIndex < 0) return '0';
-	
-	// تولید ID با فرمت ساده - فقط عدد
-	return numIndex.toString();
+	// نمایش دقیق همان مقدار کنترکت بدون هیچ تغییری
+	return index.toString();
 };
 
 // تابع نمایش ID در گوشه بالا سمت راست

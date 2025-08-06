@@ -175,7 +175,7 @@
                 const daiRaw = await dai.balanceOf(address);
                 daiBalance = ethers.formatUnits(daiRaw, 18);
             } catch {}
-            // ایندکس و CPA ID
+            // ایندکس
             const cpaId = user.index ? `CPA${user.index.toString().padStart(5, '0')}` : '-';
             // شرط فعال بودن دکمه کشبک ماهانه
             let canMonthlyCashback = false;
@@ -221,7 +221,7 @@
                 </div>
                 <div id="monthly-cashback-msg" style="display:none;color:#ff4444;text-align:center;margin-bottom:1.2rem;font-size:1.05em;transition:opacity 0.3s;"></div>
                 <div class="profile-row"><span class="profile-label">آدرس کیف پول:</span><span class="profile-value">${address}</span></div>
-                <div class="profile-row"><span class="profile-label">CPA ID:</span><span class="profile-value">${cpaId}</span></div>
+                <div class="profile-row"><span class="profile-label">ایندکس:</span><span class="profile-value">${cpaId}</span></div>
                 <div class="profile-row"><span class="profile-label">ایندکس:</span><span class="profile-value">${user.index}</span></div>
                 <div class="profile-row"><span class="profile-label">فعال:</span><span class="profile-value">${user.activated ? 'بله' : 'خیر'}</span></div>
                 <div class="profile-row"><span class="profile-label">امتیاز باینری:</span><span class="profile-value">${user.binaryPoints}</span></div>

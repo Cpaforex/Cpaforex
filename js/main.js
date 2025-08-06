@@ -2299,7 +2299,7 @@ function showUserPopup(address, user) {
     const leftColumn = [
         `Address:   ${shortAddress(address)}`,
         `Index:     ${user.index}`,
-        `CPA ID:    ${window.generateCPAId ? window.generateCPAId(user.index) : user.index}`,
+        `ایندکس:    ${window.generateCPAId ? window.generateCPAId(user.index) : user.index}`,
         `Activated: ${user.activated ? 'Yes' : 'No'}`
     ];
     
@@ -3144,7 +3144,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // حذف دکمه شناور CPA ID در زمان بارگذاری صفحه
+    // حذف دکمه شناور ایندکس در زمان بارگذاری صفحه
     setTimeout(() => {
         if (window.removeFloatingCPAId) {
             window.removeFloatingCPAId();
@@ -3185,12 +3185,8 @@ window.stopTransferBalanceAutoRefresh = function() {
 function generateCPAId(index) {
     if (!index || index === 0) return '0';
     
-    // تبدیل به عدد
-    const numIndex = typeof index === 'bigint' ? Number(index) : parseInt(index);
-    if (isNaN(numIndex) || numIndex < 0) return '0';
-    
-    // تولید ID با فرمت ساده - فقط عدد
-    return numIndex.toString();
+    // نمایش دقیق همان مقدار کنترکت بدون هیچ تغییری
+    return index.toString();
 }
 
 // تعریف تابع generateCPAId در window برای استفاده در فایل‌های دیگر
@@ -3304,12 +3300,12 @@ function updateCPAIdDisplay(index) {
     // displayCPAIdInCorner(index);
 }
 
-// تابع حذف دکمه شناور CPA ID
+// تابع حذف دکمه شناور ایندکس
 window.removeFloatingCPAId = function() {
     const existingId = document.getElementById('cpa-id-corner');
     if (existingId) {
         existingId.remove();
-        console.log('✅ Floating CPA ID removed');
+        console.log('✅ Floating index removed');
     }
 };
 

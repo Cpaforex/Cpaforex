@@ -8,8 +8,38 @@ let lastRenderedTime = 0;
 // تابع fallback برای generateCPAId اگر موجود نباشد
 if (!window.generateCPAId) {
     window.generateCPAId = function(index) {
-        return `CPA-${index}`;
+        if (!index || index === 0) return '0';
+        return index.toString();
     };
+}
+
+// تابع محاسبه رنگ بر اساس سطح درخت
+function getNodeColorByLevel(level, isActive = true) {
+    if (isActive) {
+        // برای گره‌های فعال: از روشن به تیره
+        const baseAlpha = 0.98;
+        const alphaStep = 0.15;
+        const alpha = Math.max(0.3, baseAlpha - (level * alphaStep));
+        
+        // رنگ اصلی: آبی-سبز روشن برای ریشه، تیره‌تر برای سطوح پایین‌تر
+        const baseR = 35;
+        const baseG = 41;
+        const baseB = 70;
+        const darkenStep = 15;
+        
+        const r = Math.max(20, baseR - (level * darkenStep));
+        const g = Math.max(25, baseG - (level * darkenStep));
+        const b = Math.max(45, baseB - (level * darkenStep));
+        
+        return `rgba(${r},${g},${b},${alpha})`;
+    } else {
+        // برای گره‌های خالی: از روشن به تیره
+        const baseAlpha = 0.04;
+        const alphaStep = 0.02;
+        const alpha = Math.max(0.01, baseAlpha - (level * alphaStep));
+        
+        return `rgba(255,255,255,${alpha})`;
+    }
 }
 
 function shortAddress(addr) {
@@ -18,6 +48,8 @@ function shortAddress(addr) {
 }
 
 async function showUserPopup(address, user) {
+    console.log('🚀 showUserPopup called with:', { address, user });
+    
     // تابع کوتاه‌کننده آدرس
     function shortAddress(addr) {
         if (!addr || addr === '-') return '-';
@@ -48,16 +80,26 @@ async function showUserPopup(address, user) {
             const leftChildIndex = BigInt(userIndex) * 2n;
             const rightChildIndex = BigInt(userIndex) * 2n + 1n;
             
+            console.log(`📊 فرزند چپ: ${leftChildIndex}, فرزند راست: ${rightChildIndex}`);
+            
             // بررسی فرزند چپ
             try {
+                console.log(`🔍 بررسی فرزند چپ: ${leftChildIndex}`);
                 const leftAddress = await contract.indexToAddress(leftChildIndex);
+                console.log(`📍 آدرس فرزند چپ: ${leftAddress}`);
                 if (leftAddress && leftAddress !== '0x0000000000000000000000000000000000000000') {
                     const leftUser = await contract.users(leftAddress);
+                    console.log(`👤 اطلاعات فرزند چپ:`, leftUser);
                     if (leftUser && leftUser.activated) {
                         leftCount = 1;
+                        console.log(`✅ فرزند چپ فعال است، شروع محاسبه زیرمجموعه...`);
                         // محاسبه بازگشتی برای فرزندان فرزند چپ
                         leftCount += await calculateSubtreeCount(leftChildIndex, contract, 'left');
+                    } else {
+                        console.log(`❌ فرزند چپ فعال نیست`);
                     }
+                } else {
+                    console.log(`❌ آدرس فرزند چپ خالی است`);
                 }
             } catch (e) {
                 console.log(`خطا در بررسی فرزند چپ:`, e);
@@ -65,14 +107,22 @@ async function showUserPopup(address, user) {
             
             // بررسی فرزند راست
             try {
+                console.log(`🔍 بررسی فرزند راست: ${rightChildIndex}`);
                 const rightAddress = await contract.indexToAddress(rightChildIndex);
+                console.log(`📍 آدرس فرزند راست: ${rightAddress}`);
                 if (rightAddress && rightAddress !== '0x0000000000000000000000000000000000000000') {
                     const rightUser = await contract.users(rightAddress);
+                    console.log(`👤 اطلاعات فرزند راست:`, rightUser);
                     if (rightUser && rightUser.activated) {
                         rightCount = 1;
+                        console.log(`✅ فرزند راست فعال است، شروع محاسبه زیرمجموعه...`);
                         // محاسبه بازگشتی برای فرزندان فرزند راست
                         rightCount += await calculateSubtreeCount(rightChildIndex, contract, 'right');
+                    } else {
+                        console.log(`❌ فرزند راست فعال نیست`);
                     }
+                } else {
+                    console.log(`❌ آدرس فرزند راست خالی است`);
                 }
             } catch (e) {
                 console.log(`خطا در بررسی فرزند راست:`, e);
@@ -129,11 +179,16 @@ async function showUserPopup(address, user) {
     let walletCounts = { leftCount: '⏳', rightCount: '⏳' };
     if (window.contractConfig && window.contractConfig.contract && user.index) {
         try {
+            console.log('🔍 شروع محاسبه تعداد ولت‌ها برای کاربر:', user.index);
             walletCounts = await calculateWalletCounts(user.index, window.contractConfig.contract);
+            console.log('✅ محاسبه تعداد ولت‌ها تکمیل شد:', walletCounts);
         } catch (error) {
             console.error('خطا در محاسبه تعداد ولت‌ها:', error);
             walletCounts = { leftCount: 'خطا', rightCount: 'خطا' };
         }
+    } else {
+        console.log('⚠️ contract یا user.index موجود نیست');
+        walletCounts = { leftCount: 'نامشخص', rightCount: 'نامشخص' };
     }
 
     // لیست struct
@@ -146,8 +201,8 @@ async function showUserPopup(address, user) {
       {icon:'💰', label:'سپرده کل', val:user.depositedAmount ? Math.floor(Number(user.depositedAmount) / 1e18) : 0},
       {icon:'⬅️', label:'امتیاز چپ', val:user.leftPoints},
       {icon:'➡️', label:'امتیاز راست', val:user.rightPoints},
-      {icon:'⬅️👥', label:'تعداد ولت چپ', val:walletCounts.leftCount},
-      {icon:'➡️👥', label:'تعداد ولت راست', val:walletCounts.rightCount}
+      {icon:'👥⬅️', label:'تعداد ولت چپ', val:`${walletCounts.leftCount} (تست)`},
+      {icon:'👥➡️', label:'تعداد ولت راست', val:`${walletCounts.rightCount} (تست)`}
     ];
 
     const popupEl = document.createElement('div');
@@ -162,7 +217,7 @@ async function showUserPopup(address, user) {
       <div class="user-info-card">
         <button class="close-btn" id="close-user-popup">×</button>
         <div class="user-info-btn-row">
-          <button class="user-info-btn cpa-id-btn" title="کپی CPA ID" id="copy-cpa-id">🆔 <span>${cpaId}</span></button>
+            <button class="user-info-btn cpa-id-btn" title="کپی CPA ID" id="copy-cpa-id">🆔 <span>${cpaId}</span></button>
           <button class="user-info-btn wallet-address-btn" title="کپی آدرس ولت" id="copy-wallet-address">🔗 <span>${walletAddress ? shortAddress(walletAddress) : '-'}</span></button>
           <button class="user-info-btn status-btn">${isActive ? '✅ فعال' : '❌ غیرفعال'}</button>
         </div>
@@ -405,43 +460,54 @@ async function renderVerticalNodeLazy(index, container, level = 0, autoExpand = 
         nodeDiv.style.alignItems = 'center';
         nodeDiv.style.justifyContent = 'flex-start';
         nodeDiv.style.flexWrap = 'nowrap';
-        nodeDiv.style.marginRight = (level * 2) + 'em';
-        nodeDiv.style.marginBottom = '0.7em';
+        // کاهش فاصله افقی برای سطوح عمیق‌تر
+        const marginMultiplier = level <= 3 ? 3 : (level <= 5 ? 2 : 1);
+        nodeDiv.style.marginRight = (level * marginMultiplier) + 'em';
+        nodeDiv.style.marginBottom = '1.2em'; // افزایش فاصله عمودی
         nodeDiv.style.position = 'relative';
-        nodeDiv.style.background = 'rgba(35,41,70,0.98)';
+        nodeDiv.style.background = getNodeColorByLevel(level, true);
         nodeDiv.style.borderRadius = '12px';
-        nodeDiv.style.padding = '0.7em 1.5em';
+        // اندازه فیکس برای گره‌ها
+        const cpaId = window.generateCPAId ? window.generateCPAId(user.index) : user.index;
+        
+        nodeDiv.style.padding = '0.8em 1.5em';
+        nodeDiv.style.width = '200px'; // عرض فیکس
         nodeDiv.style.minWidth = '200px';
-        nodeDiv.style.maxWidth = '400px';
+        nodeDiv.style.maxWidth = '200px';
+        nodeDiv.style.height = '50px'; // ارتفاع فیکس
         nodeDiv.style.minHeight = '50px';
-        nodeDiv.style.height = 'auto';
+        nodeDiv.style.maxHeight = '50px';
         nodeDiv.style.color = '#00ff88';
         nodeDiv.style.fontFamily = 'monospace';
         nodeDiv.style.fontSize = '1.08em';
         nodeDiv.style.boxShadow = '0 4px 16px rgba(0,255,136,0.10)';
         nodeDiv.style.cursor = 'pointer';
         nodeDiv.style.transition = 'background 0.2s, box-shadow 0.2s';
+        nodeDiv.style.whiteSpace = 'nowrap';
+        nodeDiv.style.overflow = 'hidden';
+        nodeDiv.style.textOverflow = 'ellipsis';
         nodeDiv.onmouseover = function() { this.style.background = '#232946'; this.style.boxShadow = '0 6px 24px #00ff8840'; };
-        nodeDiv.onmouseout = function() { this.style.background = 'rgba(35,41,70,0.98)'; this.style.boxShadow = '0 4px 16px rgba(0,255,136,0.10)'; };
-        const cpaId = window.generateCPAId ? window.generateCPAId(user.index) : user.index;
+        nodeDiv.onmouseout = function() { this.style.background = getNodeColorByLevel(level, true); this.style.boxShadow = '0 4px 16px rgba(0,255,136,0.10)'; };
+        
         // دکمه expand/collapse اگر دایرکت دارد یا جای خالی دارد
         let expandBtn = null;
         let childrenDiv = null;
         if (hasDirects || !leftActive || !rightActive) {
             expandBtn = document.createElement('button');
             expandBtn.textContent = autoExpand ? '▼' : '▶';
-            expandBtn.style.marginLeft = '0.7em';
+            expandBtn.style.marginLeft = '0.5em';
             expandBtn.style.background = 'transparent';
             expandBtn.style.border = 'none';
             expandBtn.style.color = '#a786ff';
-            expandBtn.style.fontSize = '1em';
+            expandBtn.style.fontSize = '1.2em';
             expandBtn.style.cursor = 'pointer';
             expandBtn.style.verticalAlign = 'middle';
+            expandBtn.style.fontWeight = 'bold';
             expandBtn.setAttribute('aria-label', 'Expand/Collapse');
         }
         // حذف ساخت علامت سوال کنار گره
         nodeDiv.innerHTML = `
-            <span style="margin-right:0.7em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${cpaId}</span>
+            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.1em; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-weight: bold;">${cpaId}</span>
         `;
         if (expandBtn) nodeDiv.prepend(expandBtn);
         nodeDiv.addEventListener('click', function(e) {
@@ -499,13 +565,15 @@ async function renderVerticalNodeLazy(index, container, level = 0, autoExpand = 
             childrenDiv.style.display = autoExpand ? 'block' : 'none';
             childrenDiv.style.transition = 'all 0.3s';
             childrenDiv.style.flexDirection = 'column'; // عمودی
-            childrenDiv.style.gap = '0.2em';
+            childrenDiv.style.gap = '0.8em'; // افزایش فاصله بین فرزندان
             container.appendChild(childrenDiv);
             // چپ
             if (leftActive) {
                 let leftChildDiv = document.createElement('div');
                 leftChildDiv.style.display = 'block';
-                leftChildDiv.style.marginRight = ((level + 1) * 2) + 'em';
+                // کاهش فاصله افقی برای سطوح عمیق‌تر
+                const childMarginMultiplier = (level + 1) <= 3 ? 3 : ((level + 1) <= 5 ? 2 : 1);
+                leftChildDiv.style.marginRight = ((level + 1) * childMarginMultiplier) + 'em';
                 await renderVerticalNodeLazy(BigInt(leftUser.index), leftChildDiv, level + 1, false);
                 childrenDiv.appendChild(leftChildDiv);
             }
@@ -513,7 +581,9 @@ async function renderVerticalNodeLazy(index, container, level = 0, autoExpand = 
             if (rightActive) {
                 let rightChildDiv = document.createElement('div');
                 rightChildDiv.style.display = 'block';
-                rightChildDiv.style.marginRight = ((level + 1) * 2) + 'em';
+                // کاهش فاصله افقی برای سطوح عمیق‌تر
+                const childMarginMultiplier = (level + 1) <= 3 ? 3 : ((level + 1) <= 5 ? 2 : 1);
+                rightChildDiv.style.marginRight = ((level + 1) * childMarginMultiplier) + 'em';
                 await renderVerticalNodeLazy(BigInt(rightUser.index), rightChildDiv, level + 1, false);
                 childrenDiv.appendChild(rightChildDiv);
             }
@@ -521,20 +591,20 @@ async function renderVerticalNodeLazy(index, container, level = 0, autoExpand = 
         // اگر جایگاه خالی وجود دارد، فقط یک دکمه کوچک "نیو" نمایش بده
         if (!leftActive || !rightActive) {
             let newBtn = document.createElement('button');
-            newBtn.textContent = 'ثبت جدید';
+            newBtn.textContent = 'N';
             newBtn.title = 'ثبت‌نام زیرمجموعه جدید';
             newBtn.style.background = 'linear-gradient(90deg,#a786ff,#00ff88)';
             newBtn.style.color = '#181c2a';
             newBtn.style.fontWeight = 'bold';
             newBtn.style.border = 'none';
             newBtn.style.borderRadius = '6px';
-            newBtn.style.padding = '0.2em 0.9em';
+            newBtn.style.padding = '0.4em 1.2em';
             newBtn.style.cursor = 'pointer';
-            newBtn.style.fontSize = '0.95em';
-            newBtn.style.marginRight = '0.7em';
-            newBtn.style.marginLeft = '0.7em';
+            newBtn.style.fontSize = '0.9em';
+            newBtn.style.marginRight = '0.8em';
+            newBtn.style.marginLeft = '0.8em';
             newBtn.style.whiteSpace = 'nowrap';
-            newBtn.style.fontSize = '0.8em';
+            newBtn.style.fontWeight = 'bold';
             newBtn.onclick = async function(e) {
                 e.stopPropagation();
                 // اگر modal قبلی باز است، حذف کن
@@ -677,26 +747,34 @@ async function renderVerticalNodeLazy(index, container, level = 0, autoExpand = 
 }
 // تابع رندر گره خالی (علامت سؤال) به صورت عمودی
 function renderEmptyNodeVertical(index, container, level) {
+    // اندازه فیکس برای گره خالی
     const emptyNode = document.createElement('div');
     emptyNode.className = 'empty-node';
     emptyNode.setAttribute('data-index', index);
     emptyNode.style.display = 'block';
-    emptyNode.style.marginRight = (level * 2) + 'em';
-    emptyNode.style.marginBottom = '0.5em';
-    emptyNode.style.background = 'rgba(255,255,255,0.04)';
+    // کاهش فاصله افقی برای سطوح عمیق‌تر
+    const marginMultiplier = level <= 3 ? 3 : (level <= 5 ? 2 : 1);
+    emptyNode.style.marginRight = (level * marginMultiplier) + 'em';
+    emptyNode.style.marginBottom = '1.2em'; // افزایش فاصله عمودی
+    emptyNode.style.background = getNodeColorByLevel(level, false);
     emptyNode.style.borderRadius = '8px';
-    emptyNode.style.padding = '0.5em 1.2em';
-    emptyNode.style.minWidth = '150px';
-    emptyNode.style.maxWidth = '300px';
-    emptyNode.style.minHeight = '40px';
-    emptyNode.style.height = 'auto';
+    emptyNode.style.padding = '0.6em 1.2em';
+    emptyNode.style.width = '180px'; // عرض فیکس برای گره خالی
+    emptyNode.style.minWidth = '180px';
+    emptyNode.style.maxWidth = '180px';
+    emptyNode.style.height = '45px'; // ارتفاع فیکس برای گره خالی
+    emptyNode.style.minHeight = '45px';
+    emptyNode.style.maxHeight = '45px';
     emptyNode.style.color = '#888';
     emptyNode.style.fontFamily = 'monospace';
     emptyNode.style.fontSize = '1em';
     emptyNode.style.cursor = 'pointer';
     emptyNode.style.opacity = '0.7';
+    emptyNode.style.whiteSpace = 'nowrap';
+    emptyNode.style.overflow = 'hidden';
+    emptyNode.style.textOverflow = 'ellipsis';
     emptyNode.innerHTML = `
-        <span style="margin-right:0.7em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${index}</span>
+        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1em; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-weight: bold;">${index}</span>
     `;
     emptyNode.title = 'ثبت‌نام زیرمجموعه جدید';
     emptyNode.onmouseover = function() { this.style.opacity = '1'; };

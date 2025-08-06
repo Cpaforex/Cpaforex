@@ -249,7 +249,7 @@
           // مقداردهی پیش‌فرض فیلد ایندکس فقط اگر مقدار فعلی راهنما یا خالی است
           const indexInput = document.getElementById('index-search');
           if ((!indexInput.value || indexInput.value === defaultGuide) && user.activated && user.index) {
-            // فرمت CPA ID
+            // فرمت ایندکس
             let cpaId = 'CPA' + user.index.toString().padStart(5, '0');
             indexInput.value = cpaId;
             indexInput.style.background = '';
