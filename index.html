@@ -332,8 +332,217 @@
           <button id="cpa-expand-btn" style="background:linear-gradient(90deg,#00ff88,#a786ff);color:#181c2a;font-weight:bold;border:none;border-radius:8px;padding:0.7rem 2.2rem;font-size:1rem;cursor:pointer;box-shadow:0 2px 12px rgba(0,255,136,0.10);transition:background 0.2s,box-shadow 0.2s;">نمایش بیشتر</button>
         </div>
       </div>
+
+      <!-- Welcome Popup Modal -->
+      <div id="welcome-modal" style="display:flex;position:fixed;z-index:200000;top:0;left:0;width:100vw;height:100vh;background:rgba(24,28,42,0.95);align-items:center;justify-content:center;backdrop-filter:blur(5px);">
+        <div id="welcome-modal-content" style="background:linear-gradient(135deg,#232946,#181c2a);border-radius:20px;max-width:95vw;width:650px;max-height:calc(100vh - 0.6in);margin:0.3in auto; padding:2.5em 2em 2em 2em;box-shadow:0 12px 48px rgba(0,0,0,0.3);position:relative;color:#fff;font-size:1.1em;line-height:1.8;overflow-y:auto;-webkit-overflow-scrolling:touch;border:2px solid #a786ff33;">
+          
+          <div style="text-align:center;margin-bottom:2em;">
+            <h2 style="color:#00ff88;font-size:1.3em;font-weight:bold;margin:0;text-shadow:0 2px 8px rgba(0,255,136,0.3);">🌟 خوش آمدید به آکادمی سود مستمر 🌟</h2>
+            <div style="width:80px;height:3px;background:linear-gradient(90deg,#00ff88,#a786ff);margin:1em auto;border-radius:3px;"></div>
+          </div>
+          
+          <div style="text-align:justify;direction:rtl;">
+            <div id="welcome-typewriter-content" style="line-height:1.8;font-size:1.05em;max-height:calc(1.8em * 15);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+               <div style="background:rgba(0,255,136,0.08);padding:1.2em;border-radius:12px;border-right:4px solid #00ff88;margin-bottom:1em;">
+                 <p style="margin:0;color:#e0e6f7;font-weight:500;">⚠️ <strong>اطلاعیه مهم:</strong> سرمایه‌گذاری بدون دانش و مدیریت ریسک می‌تواند منجر به زیان شود. سیستم بر پایه قراردادهای هوشمند غیرمتمرکز و شفاف روی اتریوم و پالیگان است.</p>
+               </div>
+               <p style="margin-top:0;">این پلتفرم بر <strong>غیرمتمرکز بودن</strong>، <strong>شفافیت</strong> و <strong>آموزش مستمر</strong> تکیه دارد. بازگشت‌های ماهانه، پورسانت‌ها و تمامی محاسبات طبق منطق قرارداد اجرا می‌شود. لطفاً با دید بلندمدت و سرمایه مازاد وارد شوید.</p>
+             </div>
+           </div>
+          
+          <div id="welcome-footer" style="position:sticky;bottom:0;left:0;right:0;text-align:center;margin-top:1.2em;padding-top:0.8em;background:linear-gradient(180deg,rgba(35,41,70,0),rgba(35,41,70,0.92));backdrop-filter:blur(4px);">
+            <button id="welcome-understand-btn" style="background:linear-gradient(90deg,#00ff88,#a786ff);color:#181c2a;border:none;border-radius:12px;padding:1em 2.5em;font-size:1.05em;font-weight:bold;cursor:pointer;box-shadow:0 4px 16px rgba(0,255,136,0.3);transition:all 0.3s;">
+               متوجه شدم، ادامه دهید 🚀
+             </button>
+           </div>
+        </div>
+      </div>
+
+      <!-- Responsive styles for welcome modal -->
+      <style id="welcome-modal-mobile">
+        @media (max-width: 600px) {
+          #welcome-modal-content {
+            width: 92vw !important;
+            max-height: calc(100vh - 0.6in) !important;
+            margin: 0.3in auto !important;
+            padding: 1.2em 1em 1em 1em !important;
+            border-radius: 14px !important;
+            font-size: 0.95em !important;
+            line-height: 1.7 !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+          #welcome-typewriter-content {
+            font-size: 1em !important;
+            line-height: 1.7 !important;
+            max-height: calc(1.7em * 15) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+          #welcome-modal h2 {
+            font-size: 1.05em !important;
+          }
+          #welcome-footer {
+            padding-top: 0.6em !important;
+            background: linear-gradient(180deg,rgba(35,41,70,0),rgba(35,41,70,0.96)) !important;
+          }
+          #welcome-understand-btn {
+            width: 100% !important;
+            padding: 0.85em 1.2em !important;
+            font-size: 1em !important;
+            border-radius: 10px !important;
+          }
+        }
+        @media (max-width: 360px) {
+          #welcome-modal-content {
+            width: 94vw !important;
+            max-height: calc(100vh - 0.6in) !important;
+            margin: 0.3in auto !important;
+            padding: 0.9em !important;
+            font-size: 0.9em !important;
+          }
+          #welcome-typewriter-content {
+            max-height: calc(1.7em * 15) !important;
+            overflow-y: auto !important;
+          }
+          #welcome-understand-btn {
+            font-size: 0.95em !important;
+            padding: 0.75em 1em !important;
+          }
+        }
+      </style>
+
       <script>
       document.addEventListener('DOMContentLoaded', function() {
+        // نمایش پاپ آپ خوشامدگویی
+        function showWelcomeModal() {
+          console.log('🔄 showWelcomeModal called');
+          const modal = document.getElementById('welcome-modal');
+          const closeBtn = document.getElementById('welcome-modal-close');
+          const understandBtn = document.getElementById('welcome-understand-btn');
+          console.log('Modal element found:', !!modal);
+          
+          // Always show the welcome modal on each visit
+          
+          // نمایش مودال بعد از 1.5 ثانیه
+          console.log('⏱️ Setting timeout for modal display');
+          setTimeout(() => {
+            console.log('⚡ Timeout reached, showing modal');
+            if (modal) {
+              modal.style.display = 'flex';
+              document.body.style.overflow = 'hidden';
+              console.log('✅ Modal display set to flex');
+              startWelcomeTypewriter();
+            } else {
+              console.error('❌ Modal element not found!');
+            }
+          }, 1500);
+          
+          function closeModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            // Do not persist seen flag; always show on next visit
+          }
+          
+          if (closeBtn) closeBtn.onclick = closeModal;
+          if (understandBtn) understandBtn.onclick = closeModal;
+          
+          // بستن با کلیک روی بک‌گراند
+          modal.onclick = function(e) {
+            if (e.target === modal) closeModal();
+          };
+        }
+
+        // تایپ‌رایتر پاپ آپ خوشامدگویی
+        function startWelcomeTypewriter() {
+          const container = document.getElementById('welcome-typewriter-content');
+          if (!container) return;
+          
+          const welcomeText = `<div style="background:rgba(0,255,136,0.08);padding:1.2em 1.4em;border-radius:12px;border-right:4px solid #00ff88;margin-bottom:1.2em;">
+  <p style="margin:0;color:#e0e6f7;font-weight:500;">
+    ⚠️ <strong>اطلاعیه مهم:</strong> ورود به هر بازار مالی مستلزم <strong>دانش، انضباط و مدیریت ریسک</strong> است. صرفِ استفاده از این پلتفرم به‌تنهایی باعث ثروتمند شدن شما نخواهد شد؛ <strong>بینش و استمرار شما</strong> نتیجه را می‌سازد.
+  </p>
+</div>
+
+<h3 style="color:#a786ff;font-size:1.25em;margin:0 0 0.8em 0;">دربارهٔ سامانه</h3>
+<p style="margin-top:0;">
+  این اکوسیستم بر پایهٔ <strong>قراردادهای هوشمند غیرمتمرکز</strong> بنا شده و بدون هرگونه مدیر متمرکز، مطابق منطق از پیش‌تعریف‌شده اجرا می‌شود. زیرساخت ما از شبکه‌های <strong>اتریوم</strong> و <strong>پالیگان</strong> و همچنین ارز پایدارِ غیرمتمرکز <strong>DAI</strong> بهره می‌برد؛ تا <strong>شفافیت، امنیت و دسترسی جهانی</strong> فراهم گردد.
+ </p>
+
+<h3 style="color:#a786ff;font-size:1.25em;margin:1.1em 0 0.6em 0;">اصول و مزایا</h3>
+<ul style="list-style:none;padding:0;margin:0;">
+  <li style="margin-bottom:0.65em;padding-right:1.5em;position:relative;">
+    <span style="position:absolute;right:0;color:#00ff88;">🔹</span>
+    <strong>رشد تدریجی توکن CPA</strong> با هدف پایداری رفتاری و کاهش نوسانات هیجانی
+  </li>
+  <li style="margin-bottom:0.65em;padding-right:1.5em;position:relative;">
+    <span style="position:absolute;right:0;color:#00ff88;">🔹</span>
+    <strong>ریسک منطقی مدیریت‌شده</strong>؛ افت‌های معمول در منطق سیستم محدود و هزینه‌های شبکه/کارمزد باید در محاسبات لحاظ شود
+  </li>
+  <li style="margin-bottom:0.65em;padding-right:1.5em;position:relative;">
+    <span style="position:absolute;right:0;color:#00ff88;">🔹</span>
+    <strong>شفافیت کامل</strong>؛ همهٔ تراکنش‌ها و محاسبات بر بستر زنجیره قابل رهگیری است
+  </li>
+</ul>
+
+<h3 style="color:#a786ff;font-size:1.25em;margin:1.1em 0 0.6em 0;">سازوکار بازدهی</h3>
+<p style="margin-top:0;">
+  در حالت عدم فعالیت، <strong>بازگشت ماهانهٔ ۳٪</strong> از مبلغ ورود طبق منطق قرارداد قابل دریافت است. با دریافت هرگونه پورسانت بازاریابی، مبالغ بازگشتی از سهم درآمدی کسر و <strong>تسویه منصفانه</strong> انجام می‌شود. موفقیت در بازاریابی، تابع <strong>کیفیت معرفی، آموزش و پشتیبانی شبکه</strong> است.
+</p>
+
+<h3 style="color:#a786ff;font-size:1.25em;margin:1.1em 0 0.6em 0;">توصیهٔ مسئولانه</h3>
+<ul style="list-style:none;padding:0;margin:0;">
+  <li style="margin-bottom:0.65em;padding-right:1.5em;position:relative;">
+    <span style="position:absolute;right:0;color:#00ff88;">✅</span>
+    با <strong>سرمایهٔ مازاد</strong> و پس از مطالعهٔ مستندات وارد شوید
+  </li>
+  <li style="margin-bottom:0.65em;padding-right:1.5em;position:relative;">
+    <span style="position:absolute;right:0;color:#00ff88;">✅</span>
+    <strong>مدیریت ریسک</strong>، تنوع‌سازی و دید بلندمدت را در اولویت بگذارید
+  </li>
+  <li style="margin-bottom:0.65em;padding-right:1.5em;position:relative;">
+    <span style="position:absolute;right:0;color:#00ff88;">✅</span>
+    در صورت ابهام، از تیم ما <strong>راهنمایی شفاف</strong> بخواهید
+  </li>
+</ul>
+
+<div style="margin-top:1.2em;background:rgba(167,134,255,0.08);padding:1em;border-radius:10px;border-right:4px solid #a786ff;">
+  <p style="margin:0;">هدف ما <strong>همراهی آگاهانه</strong> با شماست؛ تا با اتکا به فناوری غیرمتمرکز، آموزشی منظم و تصمیم‌های سنجیده، مسیری <strong>شفاف و پایدار</strong> را تجربه کنید.</p>
+</div>`;
+          
+          let i = 0;
+          const speed = 15; // سرعت تایپ‌رایتر (میلی‌ثانیه)
+          
+          function typeWriter() {
+            if (i < welcomeText.length) {
+              let char = welcomeText.charAt(i);
+              
+              // اگر کاراکتر < باشد، کل تگ HTML را یکجا اضافه کن
+              if (char === '<') {
+                let tagEnd = welcomeText.indexOf('>', i);
+                if (tagEnd !== -1) {
+                  container.innerHTML += welcomeText.substring(i, tagEnd + 1);
+                  i = tagEnd + 1;
+                  // auto-scroll as content grows
+                  container.scrollTop = container.scrollHeight;
+                  setTimeout(typeWriter, 5); // تگ‌ها سریع اضافه شوند
+                  return;
+                }
+              }
+              
+              container.innerHTML += char;
+              i++;
+              // auto-scroll as content grows
+              container.scrollTop = container.scrollHeight;
+              const delay = (char === '.' || char === '!' || char === '؟' || char === '،') ? speed * 3 : speed;
+              setTimeout(typeWriter, delay);
+            }
+          }
+          
+          typeWriter();
+        }
+        
+        showWelcomeModal();
         const text = `آکادمی سود مستمر (CPA) یک اکوسیستم نوآورانه و مردم‌محور است که با هدف ارائه خدمات مالی، آموزشی و معاملاتی کاملاً غیرمتمرکز و شفاف، بنیان نهاده شده است. در این مجموعه، سرمایه شما همیشه در اختیار خودتان باقی می‌ماند؛ چه در حساب شخصی‌تان در صرافی، چه در بروکر، و چه در کیف پول هوشمند متصل به قرارداد غیرمتمرکز.\n\nخدمات ما:\n• ارائه سیگنال‌های تخصصی و ربات‌های اتوترید برای بازارهای مالی\n• امکان فعالیت به عنوان ایجنت برای افراد و IB در بروکرها\n• امکان بازاریابی شبکه‌ای برای دوستانی که می‌خواهند این مجموعه را ارتقا دهند\n• شما می‌توانید از سهام‌های معرفی افراد (Referral Shares) بهره‌مند شوید.\n• همچنین می‌توانید با سرمایه‌گذاری در صندوق CPA و توکن افزایشی آن، به صورت تضمینی به سود برسید.\n• آموزش‌های جامع فارکس و ارز دیجیتال\n• پشتیبانی از صندوق غیرمتمرکز CPA و توکن CPA\n• خدمات کپی‌ترید: اگر ربات CPA سود کند، شما هم سود می‌کنید و اگر ضرر کند، شما نیز ضرر می‌کنید؛ هیچ سودی از حساب شما در زمان ضرر برداشت نمی‌شود و تا جبران ضرر، CPA سهمی دریافت نمی‌کند.\n• شعار ما: سرمایه‌ات در حساب خودت، سودت واقعی و شفاف\n\nصداقت، شفافیت و خدمات صددرصدی، اصول بنیادین ماست. هیچ‌گاه سرمایه شما به حساب CPA منتقل نمی‌شود؛ بلکه شما همواره کنترل کامل دارایی خود را دارید و تنها در سود واقعی شریک هستیم. در دنیایی که بسیاری به دنبال جذب سرمایه مردم و ارائه وعده‌های توخالی هستند، ما در CPA تنها زمانی سود می‌بریم که شما واقعاً سود کنید و در زیان، شریک و همراه شما خواهیم بود.\n\nCPA؛ انتخابی برای آینده‌ای مطمئن، شفاف و مردم‌محور.`;
         const container = document.getElementById('cpa-typewriter');
         let i = 0;
@@ -626,36 +835,7 @@
     </div>
   </div>
 
-  <!-- Network Section -->
-  <div id="main-network" class="page-section expandable-container" style="width:100vw;max-width:none;margin:0;left:0;right:0;padding:0.5rem 0;display:none;">
-    <div class="expand-header">
-      <h2 style="color: #00ff88; margin: 0;">🌐 Network</h2>
-    </div>
-    <div class="expand-content">
-      <div class="network-container" style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
-        <!-- Network Stats -->
-        <div id="network-stats" class="network-user-info-container"></div>
-        
-        <!-- Network Members List -->
-        <div id="network-tree">
-          <div style="color:#00ccff;text-align:center;padding:2rem;">
-            🔄 در حال بارگذاری درخت شبکه...
-            <br><br>
-            <button onclick="window.initializeNetworkTab()" style="
-              background: linear-gradient(135deg, #00ff88, #00cc66);
-              color: #232946;
-              border: none;
-              padding: 0.8rem 1.5rem;
-              border-radius: 8px;
-              font-weight: bold;
-              cursor: pointer;
-              margin-top: 1rem;
-            ">🔄 بارگذاری مجدد</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  
 
 
   <!-- نمایش وضعیت اتصال -->
@@ -679,7 +859,6 @@
     <script src="js/smooth-value-updater.js"></script>
     <script src="js/smart-dashboard-updater.js"></script>
     <script src="js/central-dashboard-updater.js"></script>
-    <script src="js/usdc-balance-debugger.js"></script>
     <script src="js/test-address-config.js"></script>
     <script src="js/final-test-config.js"></script>
     <script src="js/dashboard-loading-manager.js"></script>
@@ -1290,26 +1469,34 @@
           // دریافت موجودی بر اساس توکن انتخاب شده
           if (selectedToken === 'dai') {
             const daiBalanceEl = document.getElementById('transfer-dai-balance');
-            if (daiBalanceEl && daiBalanceEl.textContent !== '-' && daiBalanceEl.textContent !== 'خطا' && daiBalanceEl.textContent !== 'متصل نیست') {
-              maxAmount = parseFloat(daiBalanceEl.textContent).toString();
+            if (daiBalanceEl) {
+              const raw = parseFloat(daiBalanceEl.dataset.value || daiBalanceEl.textContent);
+              if (!isNaN(raw) && raw > 0) maxAmount = raw.toString();
             }
           } else if (selectedToken === 'pol') {
             const polBalanceEl = document.getElementById('transfer-poly-balance');
-            if (polBalanceEl && polBalanceEl.textContent !== '-' && polBalanceEl.textContent !== 'خطا' && polBalanceEl.textContent !== 'متصل نیست') {
-              // برای POL، 0.01 کمتر از موجودی (برای کارمزد شبکه)
-              const polBalance = parseFloat(polBalanceEl.textContent);
-              maxAmount = Math.max(0, polBalance - 0.01).toString();
+            if (polBalanceEl) {
+              const raw = parseFloat(polBalanceEl.dataset.value || polBalanceEl.textContent);
+              if (!isNaN(raw)) {
+                maxAmount = Math.max(0, raw - 0.01).toString();
+              }
             }
           } else if (selectedToken === 'cpa') {
             const cpaBalanceEl = document.getElementById('transfer-cpa-balance');
-            if (cpaBalanceEl && cpaBalanceEl.textContent !== '-' && cpaBalanceEl.textContent !== 'خطا' && cpaBalanceEl.textContent !== 'متصل نیست') {
-              maxAmount = parseFloat(cpaBalanceEl.textContent).toString();
+            if (cpaBalanceEl) {
+              const raw = parseFloat(cpaBalanceEl.dataset.value || cpaBalanceEl.textContent);
+              if (!isNaN(raw) && raw > 0) maxAmount = raw.toString();
             }
           }
           
           // تنظیم مقدار در فیلد ورودی
           if (parseFloat(maxAmount) > 0) {
-            transferAmountInput.value = maxAmount;
+            const decimals = (transferTokenSelect.value === 'cpa') ? 6 : 18;
+            // برای DAI و POL بهتر است 2 یا 4 رقم استفاده کنیم؛ برای CPA تا 6 رقم
+            const floorToDecimals = (val, d) => { const m = Math.pow(10, d); return Math.floor(Number(val) * m) / m; };
+            const d = (transferTokenSelect.value === 'cpa') ? 6 : 4;
+            const floored = floorToDecimals(maxAmount, d);
+            transferAmountInput.value = floored.toFixed(d);
             // تغییر متن دکمه به صورت موقت
             const originalText = maxAmountBtn.textContent;
             maxAmountBtn.textContent = '✓ تنظیم شد';
@@ -1878,6 +2065,110 @@
   div[style*="background:rgba(0,0,0,0.3);border-radius:12px;padding:0.8rem;border:1px solid"] > div[style*="font-size:0.7rem;margin-top:0.2rem;"] {
     font-size: 0.75rem !important;
     margin-top: 0.3rem !important;
+  }
+}
+
+/* جلوگیری از بیرون زدن اعداد طولانی از داخل کارت‌ها (در همه اندازه‌ها) */
+div[style*="background:rgba(0,0,0,0.3);border-radius:12px;padding:0.8rem;border:1px solid"] > div[style*="font-size:0.9rem;font-family:monospace;font-weight:bold;"] {
+  word-break: break-all !important;
+  overflow-wrap: anywhere !important;
+  white-space: normal !important;
+  max-width: 100% !important;
+}
+
+/* چیدمان واکنش‌گرا برای کارت‌های متریک داشبورد در تبلت و دسکتاپ */
+@media (min-width: 769px) and (max-width: 1023px) {
+  /* ظرف کارت‌ها → 2 ستون در هر سطر */
+  div[style*="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center;"] {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.8rem !important;
+    justify-content: center !important;
+  }
+  /* خود کارت‌ها داخل ظرف بالا */
+  div[style*="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center;"] > div[style*="background:rgba(0,0,0,0.3);border-radius:12px;padding:0.8rem;border:1px solid"] {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    flex: none !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* ظرف کارت‌ها → 3 ستون در هر سطر */
+  div[style*="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center;"] {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+    justify-content: center !important;
+  }
+  /* خود کارت‌ها داخل ظرف بالا */
+  div[style*="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center;"] > div[style*="background:rgba(0,0,0,0.3);border-radius:12px;padding:0.8rem;border:1px solid"] {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    flex: none !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* حالت عرض پویا برای کارت‌های متریک داشبورد در تبلت/دسکتاپ
+   این بلوک قوانین گرید را در بالا override می‌کند تا کارت‌ها به اندازهٔ محتوا عریض شوند */
+@media (min-width: 769px) {
+  /* ظرف کارت‌ها: فلکس و قابل پیچش */
+  div[style*="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center;"] {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.8rem !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+  }
+  /* خود کارت‌ها: عرض بر اساس محتوا */
+  div[style*="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center;"] > div[style*="background:rgba(0,0,0,0.3);border-radius:12px;padding:0.8rem;border:1px solid"] {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  /* مقدارها: یک‌خطی بمانند تا کارت عریض شود */
+  div[style*="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center;"] > div[style*="background:rgba(0,0,0,0.3);border-radius:12px;padding:0.8rem;border:1px solid"] > div[style*="font-size:0.9rem;font-family:monospace;font-weight:bold;"] {
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
+}
+
+/* حالت عرض پویا برای کارت‌های متریک داشبورد در موبایل */
+@media (max-width: 768px) {
+  /* ظرف کارت‌ها: فلکس، پیچش فعال، چینش ردیفی، اسکرول افقی در صورت نیاز */
+  div[style*="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center;"] {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    gap: 0.6rem !important;
+    width: 100% !important;
+    padding: 0 0.5rem !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  /* کارت‌ها: عرض بر اساس محتوا، جلوگیری از کشیده شدن به 100% */
+  div[style*="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center;"] > div[style*="background:rgba(0,0,0,0.3);border-radius:12px;padding:0.8rem;border:1px solid"] {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: max-content !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+  /* مقدارها: یک‌خطی برای افزایش عرض کارت */
+  div[style*="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center;"] > div[style*="background:rgba(0,0,0,0.3);border-radius:12px;padding:0.8rem;border:1px solid"] > div[style*="font-size:0.9rem;font-family:monospace;font-weight:bold;"] {
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
   }
 }
 </style>
