@@ -1,11 +1,6 @@
-const deepseek_api ='sk-6074908ce7954bd89d494d57651392a8';
-// Expose config variables globally for reports and other scripts
-window.deepseek_api = deepseek_api;
+// تنظیمات قرارداد cpaforex
 
-
-// تنظیمات قرارداد LevelUp
-
-const CPA_ADDRESS = '0x0f5Da8FB0b32b223fFda6b7905cD1393924bdF0F';
+const CPA_ADDRESS = '0xA3d5445e3e57dDA57C69184e88A93C9f6f7f9aA6';
 window.CPA_ADDRESS = CPA_ADDRESS;
 
 // آدرس DAI (Polygon)
