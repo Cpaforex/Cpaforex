@@ -224,13 +224,7 @@ class SwapManager {
             console.log('📊 موجودی DAI قرارداد:', daiBalanceNum);
             
             if (direction.value === 'dai-to-cpa') {
-                // Buy limits (طبق قرارداد)
-                let maxBuy;
-                if (daiBalanceNum <= 100000) {
-                    maxBuy = 1000;
-                } else {
-                    maxBuy = daiBalanceNum * 0.01;
-                }
+                // محدودیت سقف خرید: 1000 DAI
                 const deployerPct = 0.005; // 0.5%
                 const backingPct = this.getBackingFeePct(daiBalanceNum);
                 const totalFeePct = deployerPct + backingPct;
@@ -238,7 +232,7 @@ class SwapManager {
                 html += `<div style="background:#e8f5e8;padding:12px;border-radius:8px;border-left:4px solid #4caf50;margin-bottom:10px;">
                     <h4 style="margin:0 0 8px 0;color:#2e7d32;">🛒 خرید CPA با DAI</h4>
                     <p style="margin:5px 0;color:#555;"><strong>حداقل خرید:</strong> ۱ DAI</p>
-                    <p style="margin:5px 0;color:#555;"><strong>سقف خرید فعلی:</strong> ${maxBuy.toLocaleString('en-US', {maximumFractionDigits:2})} DAI</p>
+                    <p style="margin:5px 0;color:#555;"><strong>سقف خرید:</strong> ۱,۰۰۰ DAI</p>
                     <p style="margin:5px 0;color:#555;"><strong>کارمزد خرید:</strong> ${(totalFeePct*100).toFixed(1)}٪ کل</p>
                     <ul style="margin:5px 0;padding-left:20px;color:#555;">
                         <li>0.5٪ برای توسعه‌دهنده</li>
@@ -247,7 +241,7 @@ class SwapManager {
                     <p style="margin:5px 0;color:#2e7d32;"><strong>سهم شما: ${(userSharePct*100).toFixed(1)}٪ از مبلغ خرید به توکن تبدیل می‌شود</strong></p>
                 </div>`;
             } else if (direction.value === 'cpa-to-dai') {
-                // محدودیت فروش: نمایش 50% موجودی کاربر
+                // حذف محدودیت سقف فروش
                 const deployerPct = 0.005; // 0.5%
                 const backingPct = this.getBackingFeePct(daiBalanceNum);
                 const totalFeePct = deployerPct + backingPct;
@@ -255,7 +249,7 @@ class SwapManager {
                 html += `<div style="background:#fff3e0;padding:12px;border-radius:8px;border-left:4px solid #ff9800;margin-bottom:10px;">
                     <h4 style="margin:0 0 8px 0;color:#e65100;">💰 فروش CPA و دریافت DAI</h4>
                     <p style="margin:5px 0;color:#555;"><strong>حداقل فروش:</strong> ۱ توکن CPA</p>
-                    <p style="margin:5px 0;color:#555;"><strong>سقف فروش:</strong> تا ۵۰٪ موجودی شما</p>
+                    <p style="margin:5px 0;color:#555;"><strong>سقف فروش:</strong> بدون محدودیت</p>
                     <p style="margin:5px 0;color:#555;"><strong>کارمزد فروش:</strong> ${(totalFeePct*100).toFixed(1)}٪ کل (از توکن)</p>
                     <ul style="margin:5px 0;padding-left:20px;color:#555;">
                         <li>0.5٪ برای توسعه‌دهنده</li>
@@ -574,13 +568,15 @@ class SwapManager {
         }
         
         if (direction.value === 'dai-to-cpa') {
-            amount.max = this.userBalances.dai;
-            console.log('✅ حداکثر مقدار DAI تنظیم شد:', this.userBalances.dai);
+            // محدودیت خرید: حداکثر 1000 DAI
+            const maxBuyLimit = 1000;
+            const maxAmount = Math.min(this.userBalances.dai, maxBuyLimit);
+            amount.max = maxAmount;
+            console.log('✅ حداکثر مقدار DAI (محدود به 1000) تنظیم شد:', maxAmount);
         } else if (direction.value === 'cpa-to-dai') {
-            // برای جلوگیری از رد شدن توسط قرارداد، حداکثر ورودی را 50% موجودی تنظیم کن
-            const halfCpa = Math.floor(this.userBalances.cpa * 0.5 * 1e6) / 1e6;
-            amount.max = halfCpa;
-            console.log('✅ حداکثر مقدار CPA (نصف موجودی) تنظیم شد:', halfCpa);
+            // حذف محدودیت - استفاده از کل موجودی کاربر
+            amount.max = this.userBalances.cpa;
+            console.log('✅ حداکثر مقدار CPA (بدون محدودیت) تنظیم شد:', this.userBalances.cpa);
         }
     }
 
@@ -598,60 +594,42 @@ class SwapManager {
                 const m = Math.pow(10, decimals);
                 return Math.floor(Number(val) * m) / m;
             };
+            
             if (direction.value === 'dai-to-cpa') {
-                // محاسبه سقف خرید هوشمند
-                const contract = window.contractConfig.contract;
-                const daiAddress = window.DAI_ADDRESS;
-                const daiAbi = window.DAI_ABI;
-                
-                if (!contract || !daiAddress || !daiAbi) {
-                    throw new Error('تنظیمات قرارداد ناقص است');
-                }
-                
-                const daiContract = new ethers.Contract(daiAddress, daiAbi, window.contractConfig.signer);
-                const daiBalance = await daiContract.balanceOf(contract.target);
-                const daiBalanceNum = parseFloat(ethers.formatUnits(daiBalance, 18));
-                
-                // محاسبه سقف خرید بر اساس موجودی قرارداد
-                let maxBuy;
-                if (daiBalanceNum <= 100000) {
-                    maxBuy = 1000;
-                } else {
-                    maxBuy = daiBalanceNum * 0.01;
-                }
-                
-                // انتخاب کمترین مقدار بین موجودی کاربر و سقف مجاز
-                let maxAmount = Math.min(this.userBalances.dai, maxBuy);
-                // گرد کردن به پایین برای جلوگیری از خطاهای کسری
+                // محدودیت خرید: حداکثر 1000 DAI یا موجودی کاربر (کمتر)
+                const maxBuyLimit = 1000;
+                let maxAmount = Math.min(this.userBalances.dai, maxBuyLimit);
                 maxAmount = floorToDecimals(maxAmount, 2);
                 amount.value = maxAmount.toFixed(2);
                 
-                console.log('✅ حداکثر خرید هوشمند:', {
+                console.log('✅ حداکثر خرید (محدود به 1000 DAI):', {
                     userBalance: this.userBalances.dai.toFixed(2),
-                    buyLimit: maxBuy.toFixed(2),
+                    buyLimit: maxBuyLimit,
                     finalAmount: maxAmount.toFixed(2)
                 });
                 
             } else if (direction.value === 'cpa-to-dai') {
-                // برای فروش، همیشه نصف موجودی کاربر را به صورت گرد شده به پایین وارد کن
-                let half = this.userBalances.cpa * 0.5;
-                half = floorToDecimals(half, 6);
-                amount.value = half.toFixed(6);
-                console.log('✅ مقدار فروش روی نصف موجودی تنظیم شد:', {
+                // حذف محدودیت - استفاده از کل موجودی کاربر
+                let maxAmount = this.userBalances.cpa;
+                maxAmount = floorToDecimals(maxAmount, 6);
+                amount.value = maxAmount.toFixed(6);
+                console.log('✅ مقدار فروش (بدون محدودیت):', {
                     userBalance: this.userBalances.cpa.toFixed(6),
-                    half: half.toFixed(6)
+                    finalAmount: maxAmount.toFixed(6)
                 });
             }
             
             await this.updateSwapPreview();
-            console.log('✅ پیش‌نمایش بعد از تنظیم حداکثر هوشمند به‌روزرسانی شد');
+            console.log('✅ پیش‌نمایش بعد از تنظیم حداکثر به‌روزرسانی شد');
             
         } catch (error) {
-            console.error('❌ خطا در محاسبه حداکثر هوشمند:', error);
+            console.error('❌ خطا در محاسبه حداکثر:', error);
             
-            // در صورت خطا، از روش قبلی استفاده کن
+            // در صورت خطا، از محدودیت‌های تعیین شده استفاده کن
             if (direction.value === 'dai-to-cpa') {
-                amount.value = this.userBalances.dai.toFixed(2);
+                const maxBuyLimit = 1000;
+                const maxAmount = Math.min(this.userBalances.dai, maxBuyLimit);
+                amount.value = maxAmount.toFixed(2);
             } else if (direction.value === 'cpa-to-dai') {
                 amount.value = this.userBalances.cpa.toFixed(6);
             }
@@ -782,18 +760,14 @@ class SwapManager {
                 throw new Error(`موجودی CPA کافی نیست. موجودی شما: ${this.userBalances.cpa.toFixed(6)} CPA`);
             }
 
-            // اعتبارسنجی مطابق قرارداد
+            // اعتبارسنجی با محدودیت‌های تعیین شده
             if (direction.value === 'dai-to-cpa') {
                 if (value < 1) throw new Error('حداقل خرید 1 DAI است');
-                // سقف خرید پویا
-                const daiContractBalance = await this.getContractDaiBalanceNum();
-                const maxBuy = (daiContractBalance <= 100000) ? 1000 : (daiContractBalance * 0.01);
-                if (value > maxBuy) throw new Error(`مقدار از سقف خرید بیشتر است (حداکثر مجاز: ${maxBuy.toFixed(2)} DAI)`);
+                // محدودیت سقف خرید: 1000 DAI
+                if (value > 1000) throw new Error('مقدار از سقف خرید بیشتر است (حداکثر مجاز: 1000 DAI)');
             } else if (direction.value === 'cpa-to-dai') {
                 if (value < 1) throw new Error('حداقل فروش 1 CPA است');
-                // محدودیت فروش: حداکثر 50% موجودی کاربر (مطابق قرارداد)
-                const maxSell = this.userBalances.cpa * 0.5;
-                if (value > maxSell) throw new Error(`مقدار از سقف فروش بیشتر است (حداکثر مجاز: ${maxSell.toFixed(6)} CPA)`);
+                // حذف محدودیت سقف فروش
             }
 
             // انجام عملیات سواپ
